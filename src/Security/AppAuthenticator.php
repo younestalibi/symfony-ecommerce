@@ -21,10 +21,10 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
     use TargetPathTrait;
 
     public const LOGIN_ROUTE = 'app_login';
+    public const ADMIN_ROUTE = 'app_admin_dashboard';
+    public const HOME_ROUTE = 'app_frontend_home';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator)
-    {
-    }
+    public function __construct(private UrlGeneratorInterface $urlGenerator) {}
 
     public function authenticate(Request $request): Passport
     {
@@ -48,7 +48,13 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-        return new RedirectResponse($this->urlGenerator->generate('app_admin'));
+        // redirect the users to their workspace based on their role
+        /** @var User $user */
+        $user = $token->getUser();
+        return match (in_array('ROLE_ADMIN', $user->getRoles())) {
+            true => new RedirectResponse($this->urlGenerator->generate(self::ADMIN_ROUTE)),
+            false => new RedirectResponse($this->urlGenerator->generate(self::HOME_ROUTE))
+        };
     }
 
     protected function getLoginUrl(Request $request): string

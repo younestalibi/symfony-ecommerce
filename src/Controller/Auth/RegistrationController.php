@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Auth;
 
 use App\Entity\User;
 use App\Form\RegistrationForm;
@@ -50,7 +50,7 @@ class RegistrationController extends AbstractController
                     ->from(new Address('admin@admin.com', 'Admin bot'))
                     ->to((string) $user->getEmail())
                     ->subject('Please Confirm your Email')
-                    ->htmlTemplate('registration/confirmation_email.html.twig')
+                    ->htmlTemplate('auth/registration/confirmation_email.html.twig')
             );
 
             // do anything else you need here, like send an email
@@ -58,7 +58,7 @@ class RegistrationController extends AbstractController
             return $security->login($user, AppAuthenticator::class, 'main');
         }
 
-        return $this->render('registration/register.html.twig', [
+        return $this->render('auth/registration/register.html.twig', [
             'registrationForm' => $form,
         ]);
     }
