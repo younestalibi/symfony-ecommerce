@@ -1,20 +1,67 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout/user.html.twig' %}
 
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Hello HomeController!
+{% endblock %}
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+{% block main_content %}
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+	<div>
+		{# Header #}
+		<section class="mb-10 overflow-hidden bg-[url(https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?q=80&w=2670&auto=format&fit=crop)] bg-cover bg-top bg-no-repeat">
+			<div class="bg-black/50 p-8 md:p-12 lg:px-16 lg:py-24">
+				<div class="text-center ltr:sm:text-left rtl:sm:text-right">
+					<h2 class="text-2xl font-bold text-white sm:text-3xl md:text-5xl">Latest Products</h2>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/youne/Desktop/projects/proje/ecommerce/src/Controller/Frontend/HomeController.php</code></li>
-        <li>Your template at <code>C:/Users/youne/Desktop/projects/proje/ecommerce/templates/frontend/home/index.html.twig</code></li>
-    </ul>
-</div>
+					<p class="hidden max-w-lg text-white/90 md:mt-6 md:block md:text-lg md:leading-relaxed">
+						Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis dolores quos, autem assumenda rerum inventore omnis qui eveniet voluptatem libero perferendis ea nobis, nisi repellendus cupiditate quaerat. Nisi, unde blanditiis
+																																																																																																																		        doloribus iure architecto quae voluptatum beatae excepturi dolores.
+					</p>
+
+					<div class="mt-4 sm:mt-8">
+						<a href="#" class="inline-block rounded-full bg-indigo-600 px-12 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:ring-3 focus:ring-yellow-400 focus:outline-hidden">
+							Get Yours Today
+						</a>
+					</div>
+				</div>
+			</div>
+		</section>
+		{# Header #}
+
+		<section class='mt-10 container mx-auto'>
+			<h2 class="text-2xl font-semibold mb-4">Featured Products</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+				{% for product in products %}
+					<a href="" class="group relative block overflow-hidden">
+						<div class="relative border border-gray-100 bg-white p-6">
+							<p class="text-gray-700">${{ product.price }}</p>
+							<h3 class="mt-1.5 text-lg font-medium text-gray-900">{{ product.name }}</h3>
+							<p class="mt-1.5 line-clamp-3 text-gray-700">{{ product.description }}</p>
+							<form class="mt-4 flex gap-4">
+								<button class="block w-full rounded-sm bg-gray-100 px-4 py-3 text-sm font-medium text-gray-900 transition hover:scale-105">
+									Add to Cart
+								</button>
+								<button type="button" class="block w-full rounded-sm bg-gray-900 px-4 py-3 text-sm font-medium text-white transition hover:scale-105">
+									Buy Now
+								</button>
+							</form>
+						</div>
+					</a>
+				{% endfor %}
+			</div>
+		</section>
+
+		<!-- Top Categories Section -->
+		<section class="mt-10 container mx-auto">
+			<h2 class="text-2xl font-semibold mb-4">Top Categories</h2>
+			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+				{% for category in categories %}
+					<div class="flex flex-col items-center text-center">
+						<h3 class="mt-4 text-lg font-medium text-gray-900">{{ category.name }}</h3>
+						<p class="mt-2 text-gray-700">{{ category.slug }}</p>
+						<a href="#" class="mt-4 text-indigo-600 hover:text-indigo-800">View Category</a>
+					</div>
+				{% endfor %}
+			</div>
+		</section>
+	</div>
 {% endblock %}
