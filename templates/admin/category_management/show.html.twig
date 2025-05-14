@@ -1,0 +1,41 @@
+{% extends 'layout/admin.html.twig' %}
+{% block title %}Category
+{% endblock %}
+{% block main_content %}
+	<div class="mb-6">
+		<h1 class="text-2xl font-semibold text-gray-800">Category</h1>
+	</div>
+	<div class="flow-root">
+		<dl class="divide-y divide-gray-200 rounded border border-gray-200 text-sm">
+			<div class="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+				<dt class="font-medium text-gray-900">ID</dt>
+
+				<dd class="text-gray-700 sm:col-span-2">{{ category.id }}</dd>
+			</div>
+
+			<div class="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+				<dt class="font-medium text-gray-900">Name</dt>
+
+				<dd class="text-gray-700 sm:col-span-2">{{ category.name }}</dd>
+			</div>
+
+			<div class="grid grid-cols-1 gap-1 p-3 sm:grid-cols-3 sm:gap-4">
+				<dt class="font-medium text-gray-900">Slug</dt>
+
+				<dd class="text-gray-700 sm:col-span-2">{{ category.slug }}</dd>
+			</div>
+		</dl>
+	</div>
+
+	<div class="mt-6 flex space-x-4">
+		<a href="{{ path('app_admin_category_management_index') }}" class="inline-block text-indigo-600 hover:text-indigo-800 font-medium text-sm py-2 px-4 border border-gray-300 rounded-md shadow-sm hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+			Back to List
+		</a>
+
+		<a href="{{ path('app_admin_category_management_edit', {'id': category.id}) }}" class="inline-block text-indigo-600 hover:text-indigo-800 font-medium text-sm py-2 px-4 border border-gray-300 rounded-md shadow-sm hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+			Edit
+		</a>
+	</div>
+
+	{{ include('admin/category_management/_delete_form.html.twig') }}
+{% endblock %}

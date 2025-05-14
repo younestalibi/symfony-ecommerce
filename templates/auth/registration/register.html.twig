@@ -1,23 +1,65 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Register{% endblock %}
-
-{% block body %}
+{% extends 'base.html.twig' %} {% block title %}Register{% endblock %} {% block
+body %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+  <div class="w-full max-w-md bg-white shadow-lg rounded-2xl p-8 space-y-6">
     {% for flash_error in app.flashes('verify_email_error') %}
-        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+    <div class="bg-red-100 text-red-700 px-4 py-3 rounded relative text-sm">
+      {{ flash_error }}
+    </div>
     {% endfor %}
 
-    <h1>Register</h1>
+    <h1 class="text-2xl font-bold text-center text-gray-800">
+      Create an account
+    </h1>
+
+    {{ form_start(registrationForm, {'attr': {'class': 'space-y-5'}}) }}
 
     {{ form_errors(registrationForm) }}
 
-    {{ form_start(registrationForm) }}
-        {{ form_row(registrationForm.email) }}
-        {{ form_row(registrationForm.plainPassword, {
-            label: 'Password'
-        }) }}
-        {{ form_row(registrationForm.agreeTerms) }}
+    <div>
+      {{ form_label(registrationForm.email, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'
+      }}) }}
+      {{ form_widget(registrationForm.email, {'attr': {
+                    'class': 'mt-1 w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
 
-        <button type="submit" class="btn">Register</button>
+      }}) }}
+      {{ form_errors(registrationForm.email) }}
+    </div>
+
+    <div>
+      {{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'
+      }}) }}
+      {{ form_widget(registrationForm.plainPassword, {'attr': {
+                    'class': 'mt-1 w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
+
+      }}) }}
+      {{ form_errors(registrationForm.plainPassword) }}
+    </div>
+
+    <div class="flex items-start">
+      {{ form_widget(registrationForm.agreeTerms, {'attr': {
+                    'class': 'mt-1 mr-2'
+
+      }}) }}
+      {{ form_label(registrationForm.agreeTerms, null, {'label_attr': {'class': 'text-sm text-gray-600'
+      }}) }}
+      {{ form_errors(registrationForm.agreeTerms) }}
+    </div>
+
+    <button
+      type="submit"
+      class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-150"
+    >
+      Register
+    </button>
     {{ form_end(registrationForm) }}
+
+    <div class="text-center text-sm text-gray-600">
+      Already have an account?
+      <a href="{{ path('app_login') }}" class="text-blue-600 hover:underline"
+        >Login</a
+      >
+    </div>
+  </div>
+</div>
 {% endblock %}
