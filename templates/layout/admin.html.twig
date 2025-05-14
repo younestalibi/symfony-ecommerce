@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+
+	{% set active_routes = {
+        'Categories': ['app_admin_category_management_index', 'app_admin_category_management_new', 'app_admin_category_management_edit', 'app_admin_category_management_show'],
+        'Products':['app_admin_dashboard']
+    } %}
+	{% set current_route = app.request.attributes.get('_route') %}
+	{% set sidebar_links = [ 
+        {'label':'Dashboard', 'route': 'app_admin_dashboard'}, 
+        {'label': 'Categories', 'route':'app_admin_category_management_index'},
+        {'label': 'Products', 'route':'app_admin_dashboard'}
+        ] %}
+
+	<div class="flex">
+		<aside class="w-64">
+			<div class="flex h-screen flex-col justify-between border-e border-gray-100 bg-white">
+				<div class="px-4 py-4">
+					<span class="grid h-10 w-32 place-content-center rounded-lg bg-gray-100 text-xs text-gray-600">
+						Logo
+					</span>
+
+
+					<ul class="mt-6 space-y-1">
+					{% for link in sidebar_links %}
+						{% set is_active = current_route in (active_routes[link.label] ?? [link.route]) %}
+						<li>
+							<a href="{{ path(link.route) }}" class="{% if is_active %}bg-gray-100 text-gray-700{% else %}text-gray-500 hover:bg-gray-100 hover:text-gray-700{% endif %} block rounded-lg px-4 py-2 text-sm font-medium">
+								{{ link.label }}
+							</a>
+						</li>
+					{% endfor %}			
+					</ul>
+				</div>
+			</div>
+		</aside>
+		<main class="flex-1">
+			<header class="flex justify-between items-center bg-gray-100 px-4 py-4">
+				<span class="grid h-10 w-32 place-content-center bg-red-100 rounded-lg text-xs">
+					Open
+				</span>
+				<div class="flex items-center gap-2">
+					<img alt="" src="https://images.unsplash.com/photo-1600486913747-55e5470d6f40?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80" class="size-10 rounded-full object-cover"/>
+
+					<div>
+						<p class="text-xs">
+							<strong class="block font-medium">{{ app.user.email }}</strong>
+							<!-- <span> name </span> -->
+						</p>
+					</div>
+				</div>
+			</header>
+			<div class="p-6">
+				{% block main_content %}{% endblock %}
+			</div>
+		</main>
+	</div>
+{% endblock %}
