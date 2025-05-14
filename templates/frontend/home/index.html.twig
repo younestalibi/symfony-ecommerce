@@ -1,6 +1,6 @@
 {% extends 'layout/user.html.twig' %}
 
-{% block title %}Hello HomeController!
+{% block title %}Hello Home!
 {% endblock %}
 
 {% block main_content %}
@@ -14,7 +14,7 @@
 
 					<p class="hidden max-w-lg text-white/90 md:mt-6 md:block md:text-lg md:leading-relaxed">
 						Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis dolores quos, autem assumenda rerum inventore omnis qui eveniet voluptatem libero perferendis ea nobis, nisi repellendus cupiditate quaerat. Nisi, unde blanditiis
-																																																																																																																		        doloribus iure architecto quae voluptatum beatae excepturi dolores.
+																																																																																																																								        doloribus iure architecto quae voluptatum beatae excepturi dolores.
 					</p>
 
 					<div class="mt-4 sm:mt-8">
@@ -31,7 +31,7 @@
 			<h2 class="text-2xl font-semibold mb-4">Featured Products</h2>
 			<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 				{% for product in products %}
-					<a href="" class="group relative block overflow-hidden">
+					<a href={{ path("app_frontend_product_show",{"productId":product.id} ) }} class="group relative block overflow-hidden">
 						<div class="relative border border-gray-100 bg-white p-6">
 							<p class="text-gray-700">${{ product.price }}</p>
 							<h3 class="mt-1.5 text-lg font-medium text-gray-900">{{ product.name }}</h3>
