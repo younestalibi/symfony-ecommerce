@@ -2,12 +2,11 @@
 
 namespace App\Controller\Frontend;
 
-use App\Entity\Order;
-use App\Entity\OrderItem;
 use App\Entity\User;
 use App\Enum\CartStatus;
 use App\Repository\AddressRepository;
 use App\Repository\CartRepository;
+use App\Service\CheckoutService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,14 +18,11 @@ final class CheckoutController extends AbstractController
 {
 
     #[Route(name: 'app_frontend_checkout', methods: ['GET'])]
-    public function index(CartRepository $cartRepository): Response
+    public function index(CheckoutService $checkoutService): Response
     {
         /** @var User $user */
         $user = $this->getUser();
-        $activeCart = $cartRepository->findOneBy([
-            'user' => $user,
-            'status' => CartStatus::ACTIVE,
-        ]);
+        $activeCart = $checkoutService->getActiveCartForUser($user);
 
         if (!$activeCart) {
             $this->addFlash('error', 'No active cart found.');
@@ -42,9 +38,8 @@ final class CheckoutController extends AbstractController
     #[Route('/place-order', name: 'app_frontend_checkout_place_order', methods: ['POST'])]
     public function placeOrder(
         Request $request,
-        AddressRepository $addressRepository,
-        EntityManagerInterface $em,
-        CartRepository $cartRepository
+        CartRepository $cartRepository,
+        CheckoutService $checkoutService
     ): Response {
 
         $addressId = $request->request->get('address_id');
@@ -54,71 +49,30 @@ final class CheckoutController extends AbstractController
             return $this->redirectToRoute('app_frontend_checkout');
         }
 
-        $address = $addressRepository->find($addressId);
-
         /** @var User $user */
         $user = $this->getUser();
 
-        // Ensure users can only select their own address
-        if (!$address || $address->getUser() !== $user) {
-            throw $this->createAccessDeniedException('Invalid address selected.');
+        try {
+            $address = $checkoutService->validateUserAddress($addressId, $user);
+        } catch (\InvalidArgumentException $e) {
+            throw $this->createAccessDeniedException($e->getMessage());
         }
+        
 
         $activeCart = $cartRepository->findOneBy([
             'user' => $user,
             'status' => CartStatus::ACTIVE,
         ]);
-        $cartItems = $activeCart->getCartItems();
 
-        if (count($cartItems) === 0) {
-            $this->addFlash('warning', 'Your cart is empty.');
+
+        try {
+            $checkoutService->validateCartStock($activeCart);
+        } catch (\RuntimeException $e) {
+            $this->addFlash('danger', $e->getMessage());
             return $this->redirectToRoute('app_frontend_cart');
         }
-        // check if quantity in stock is enough
-        foreach ($cartItems as $cartItem) {
-            if ($cartItem->getQuantity() > $cartItem->getProduct()->getQuantity()) {
-                $this->addFlash('danger', sprintf(
-                    'Not enough stock for product %s. Available: %d',
-                    $cartItem->getProduct()->getName(),
-                    $cartItem->getProduct()->getQuantity()
-                ));
-                return $this->redirectToRoute('app_frontend_cart');
-            }
-        }
 
-
-        $order = new Order();
-        $order->setUser($user);
-        $order->setShippingLine1($address->getLine1());
-        $order->setShippingLine2($address->getLine2());
-        $order->setShippingCity($address->getCity());
-        $order->setShippingCountry($address->getCountry());
-        $order->setShippingZipCode($address->getZipCode());
-
-        // Generate a reference (example:ORD-1684160401-5F3A9C)
-        try {
-            $reference = 'ORD-' . time() . '-' . strtoupper(bin2hex(random_bytes(3)));
-        } catch (\Exception $e) {
-            $reference = 'ORD-' . time() . '-' . bin2hex(random_int(100, 999));
-        }
-        $order->setReference($reference);
-
-        $total = 0;
-        foreach ($cartItems as $cartItem) {
-            $orderItem = new OrderItem();
-            $orderItem->setProduct($cartItem->getProduct());
-            $orderItem->setQuantity($cartItem->getQuantity());
-            $orderItem->setPrice($cartItem->getProduct()->getPrice());
-            $orderItem->setProductName($cartItem->getProduct()->getName());
-            $orderItem->setProductOrder($order); //associate order item with order
-            $total += $cartItem->getQuantity() * $cartItem->getProduct()->getPrice();
-            $em->persist($orderItem);
-        }
-
-        $order->setTotal($total);
-
-        $em->persist($order);
-        $em->flush();
+        $order = $checkoutService->createOrder($user, $activeCart, $address);
 
         return $this->redirectToRoute('app_payment_start', ['reference' => $order->getReference()]);
     }
