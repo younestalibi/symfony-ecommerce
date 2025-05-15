@@ -14,10 +14,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/checkout')]
 final class CheckoutController extends AbstractController
 {
 
-    #[Route('/checkout', name: 'app_frontend_checkout', methods: ['GET'])]
+    #[Route(name: 'app_frontend_checkout', methods: ['GET'])]
     public function index(CartRepository $cartRepository): Response
     {
         /** @var User $user */
@@ -38,14 +39,14 @@ final class CheckoutController extends AbstractController
         ]);
     }
 
-    #[Route('/checkout/place-order', name: 'app_frontend_checkout_place_order', methods: ['POST'])]
+    #[Route('/place-order', name: 'app_frontend_checkout_place_order', methods: ['POST'])]
     public function placeOrder(
         Request $request,
         AddressRepository $addressRepository,
         EntityManagerInterface $em,
         CartRepository $cartRepository
     ): Response {
-        $user = $this->getUser();
+
         $addressId = $request->request->get('address_id');
 
         if (!$addressId) {
@@ -58,7 +59,7 @@ final class CheckoutController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        // Ensure users can only edit their own address
+        // Ensure users can only select their own address
         if (!$address || $address->getUser() !== $user) {
             throw $this->createAccessDeniedException('Invalid address selected.');
         }
@@ -85,6 +86,7 @@ final class CheckoutController extends AbstractController
             }
         }
 
+
         $order = new Order();
         $order->setUser($user);
         $order->setShippingLine1($address->getLine1());
@@ -92,7 +94,13 @@ final class CheckoutController extends AbstractController
         $order->setShippingCity($address->getCity());
         $order->setShippingCountry($address->getCountry());
         $order->setShippingZipCode($address->getZipCode());
-        $reference = 'ORD-' . time() . '-' . strtoupper(bin2hex(random_bytes(3))); // Example: ORD-1684160401-5F3A9C        
+
+        // Generate a reference (example:ORD-1684160401-5F3A9C)
+        try {
+            $reference = 'ORD-' . time() . '-' . strtoupper(bin2hex(random_bytes(3)));
+        } catch (\Exception $e) {
+            $reference = 'ORD-' . time() . '-' . bin2hex(random_int(100, 999));
+        }
         $order->setReference($reference);
 
         $total = 0;
