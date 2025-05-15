@@ -120,6 +120,8 @@ final class CheckoutController extends AbstractController
         $em->persist($order);
         $em->flush();
 
+        return $this->redirectToRoute('app_payment_start', ['reference' => $order->getReference()]);
+
         $this->addFlash('success', 'Order placed successfully!');
         return $this->redirectToRoute('app_frontend_order', ['id' => $order->getId()]);
     }
