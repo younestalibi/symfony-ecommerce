@@ -24,7 +24,7 @@ final class CartController extends AbstractController
         $user = $this->getUser();
         $activeCart = $cartRepository->findOneBy([
             'user' => $user,
-            'status' => CartStatus::Active,
+            'status' => CartStatus::ACTIVE,
         ]);
 
         return $this->render('frontend/cart/index.html.twig', [
@@ -49,7 +49,7 @@ final class CartController extends AbstractController
         $user = $this->getUser();
         $cart = $cartRepository->findOneBy([
             'user' => $user,
-            'status' => CartStatus::Active,
+            'status' => CartStatus::ACTIVE,
         ]);;
         if (!$cart) {
             $cart = new Cart();

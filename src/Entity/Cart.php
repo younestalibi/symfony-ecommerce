@@ -21,7 +21,7 @@ class Cart
     private ?User $user = null;
 
     #[ORM\Column(enumType: CartStatus::class)]
-    private ?CartStatus $status = CartStatus::Active;
+    private ?CartStatus $status = CartStatus::ACTIVE;
 
     /**
      * @var Collection<int, CartItem>

@@ -8,7 +8,6 @@ use App\Entity\User;
 use App\Enum\CartStatus;
 use App\Repository\AddressRepository;
 use App\Repository\CartRepository;
-use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +25,7 @@ final class CheckoutController extends AbstractController
         $user = $this->getUser();
         $activeCart = $cartRepository->findOneBy([
             'user' => $user,
-            'status' => CartStatus::Active,
+            'status' => CartStatus::ACTIVE,
         ]);
 
         if (!$activeCart) {
@@ -67,7 +66,7 @@ final class CheckoutController extends AbstractController
 
         $activeCart = $cartRepository->findOneBy([
             'user' => $user,
-            'status' => CartStatus::Active,
+            'status' => CartStatus::ACTIVE,
         ]);
         $cartItems = $activeCart->getCartItems();
 

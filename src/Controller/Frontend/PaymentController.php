@@ -2,9 +2,12 @@
 
 namespace App\Controller\Frontend;
 
+use App\Enum\CartStatus;
 use App\Enum\OrderStatus;
+use App\Repository\CartRepository;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
 use Stripe\Webhook;
@@ -83,9 +86,8 @@ final class PaymentController extends AbstractController
         $em->flush();
 
 
-        return $this->render('frontend/checkout/review.html.twig', [
+        return $this->render('frontend/checkout/redirect.html.twig', [
             'stripe_url' => $session->url,
-            'order' => $order,
         ]);
     }
 
@@ -107,7 +109,9 @@ final class PaymentController extends AbstractController
     public function webhook(
         Request $request,
         OrderRepository $orderRepository,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        LoggerInterface $logger,
+        CartRepository $cartRepository
     ): Response {
         $payload = $request->getContent();
         $sigHeader = $request->headers->get('stripe-signature');
@@ -126,6 +130,8 @@ final class PaymentController extends AbstractController
             // Invalid signature
             return new Response('Invalid signature', 400);
         }
+        // log the event for debugging purposes
+        $logger->info('Stripe Webhook Event', ['event' => $event]);
 
         switch ($event->type) {
             case 'checkout.session.completed':
@@ -139,10 +145,36 @@ final class PaymentController extends AbstractController
                     'paymentIntentId' => $paymentIntentId,
                 ]);
 
-                if ($order) {
+                if ($order && $order->getStatus() !== OrderStatus::PAID) {
                     $order->setStatus(OrderStatus::PAID);
+
+                    $cart = $cartRepository->findOneBy([
+                        'user' => $order->getUser(),
+                        'status' => CartStatus::ACTIVE,
+                    ]);
+
+                    if ($cart) {
+                        $cart->setStatus(CartStatus::COMPLETED);
+                    }
+
+                    // reduce product quantities
+                    foreach ($order->getOrderItems() as $item) {
+                        $product = $item->getProduct();
+                        if ($item->getQuantity() > $product->getQuantity()) {
+                            //send email or notification to admin for low stock
+                            $logger->error('Not enough product quantity', [
+                                'product' => $product->getName(),
+                                'requested' => $item->getQuantity(),
+                                'available' => $product->getQuantity(),
+                            ]);
+                        }
+                        $product->setQuantity($product->getQuantity() - $item->getQuantity());
+                    }
+
                     $em->flush();
                 }
+
+
                 break;
         }
         return new Response('Webhook received', 200);
