@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Enum\CartStatus;
 use App\Repository\AddressRepository;
 use App\Repository\CartRepository;
+use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -121,8 +122,5 @@ final class CheckoutController extends AbstractController
         $em->flush();
 
         return $this->redirectToRoute('app_payment_start', ['reference' => $order->getReference()]);
-
-        $this->addFlash('success', 'Order placed successfully!');
-        return $this->redirectToRoute('app_frontend_order', ['id' => $order->getId()]);
     }
 }

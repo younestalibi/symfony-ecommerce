@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -63,7 +64,7 @@ final class PaymentController extends AbstractController
         );
 
         Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
-        
+
         // Create Stripe session
         $session = Session::create([
             'customer_email' => $user->getEmail(),
@@ -78,8 +79,10 @@ final class PaymentController extends AbstractController
         $order->setPaymentIntentId($session->id);
         $em->flush();
 
-        return $this->render('frontend/checkout/test.html.twig', [
+
+        return $this->render('frontend/checkout/review.html.twig', [
             'stripe_url' => $session->url,
+            'order' => $order,
         ]);
     }
 
