@@ -1,0 +1,48 @@
+{% extends 'layout/user.html.twig' %}
+{% block title %}List of Cart items
+{% endblock %}
+{% block main_content %}
+	<h2 class="text-2xl font-bold mb-4">Checkout</h2>
+
+	<form
+		action="{{ path('app_frontend_checkout_place_order') }}" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+		<!-- Address selection -->
+		<div>
+			<h3 class="text-lg font-semibold mb-2">Select Shipping Address</h3>
+			{% for address in addresses %}
+				<label class="block border p-3 rounded mb-2">
+					<input type="radio"  {% if address.isDefault %}checked{% endif %} name="address_id" value="{{ address.id }}" class="mr-2">
+					{{ address.line1 }},
+					{{ address.city }},
+					{{ address.country }}
+				</label>
+			{% endfor %}
+			<a href="{{ path('app_frontend_address_new', { returnUrl: app.request.uri }) }}" class="text-blue-500 hover:underline mt-2 inline-block">+ Add New Address</a>
+		</div>
+
+		<!-- Cart summary -->
+		<div>
+			<h3 class="text-lg font-semibold mb-2">Order Summary</h3>
+			<ul>
+				{% set total = 0 %}
+				{% for item in cart.cartItems %}
+					{% set subtotal = item.product.price * item.quantity %}
+					{% set total = total + subtotal %}
+					<li class="mb-2">
+						{{ item.product.name }}
+						x
+						{{ item.quantity }}
+						=
+						<strong>${{ subtotal|number_format(2) }}</strong>
+					</li>
+				{% endfor %}
+			</ul>
+			<p class="mt-4 font-bold">Total: ${{ total|number_format(2) }}</p>
+
+			<button type="submit" class="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
+				Place Order
+			</button>
+		</div>
+	</form>
+{% endblock %}

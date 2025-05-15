@@ -28,6 +28,9 @@ final class AddressController extends AbstractController
     #[Route('/new', name: 'app_frontend_address_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        // Ensure to return to the previous page after creating an address when user come from checkout page
+        $returnUrl = $request->query->get('returnUrl', $this->generateUrl('app_frontend_address_index'));
+
         $address = new Address();
         $form = $this->createForm(AddressForm::class, $address);
         $form->handleRequest($request);
@@ -48,12 +51,14 @@ final class AddressController extends AbstractController
             $entityManager->persist($address);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_frontend_address_index', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', 'Address created successfully.');
+            return $this->redirect($returnUrl);
         }
 
         return $this->render('frontend/address/new.html.twig', [
             'address' => $address,
             'form' => $form,
+            'returnUrl' => $returnUrl
         ]);
     }
 
@@ -72,8 +77,8 @@ final class AddressController extends AbstractController
         $user = $this->getUser();
 
         // Ensure users can only edit their own address
-        if ($address->getUser() !== $user) {
-            throw $this->createAccessDeniedException('You are not allowed to edit this address.');
+        if (!$address || $address->getUser() !== $user) {
+            throw $this->createAccessDeniedException('Invalid address selected.');
         }
 
         $form = $this->createForm(AddressForm::class, $address);
@@ -91,6 +96,7 @@ final class AddressController extends AbstractController
             }
             $entityManager->flush();
 
+            $this->addFlash('success', 'Address updated successfully.');
             return $this->redirectToRoute('app_frontend_address_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -106,13 +112,14 @@ final class AddressController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        // Ensure the address belongs to the current user
-        if ($address->getUser() !== $user) {
-            throw $this->createAccessDeniedException('You are not allowed to delete this address.');
+        // Ensure users can only edit their own address
+        if (!$address || $address->getUser() !== $user) {
+            throw $this->createAccessDeniedException('Invalid address selected.');
         }
         if ($this->isCsrfTokenValid('delete' . $address->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($address);
             $entityManager->flush();
+            $this->addFlash('success', 'Address deleted successfully.');
         }
 
         return $this->redirectToRoute('app_frontend_address_index', [], Response::HTTP_SEE_OTHER);

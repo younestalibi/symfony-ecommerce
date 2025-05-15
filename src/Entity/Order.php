@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\OrderStatus;
 use App\Repository\OrderRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -20,8 +21,8 @@ class Order
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $status = null;
+    #[ORM\Column(enumType: OrderStatus::class)]
+    private ?OrderStatus $status = OrderStatus::PENDING;
 
     #[ORM\Column]
     private ?float $total = null;
@@ -29,7 +30,7 @@ class Order
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $paymentIntentId = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $reference = null;
 
     /**
@@ -37,6 +38,21 @@ class Order
      */
     #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'productOrder', orphanRemoval: true)]
     private Collection $orderItems;
+
+    #[ORM\Column(length: 255)]
+    private ?string $shippingLine1 = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $shippingLine2 = null;
+
+    #[ORM\Column(length: 30)]
+    private ?string $shippingCity = null;
+
+    #[ORM\Column(length: 30)]
+    private ?string $shippingCountry = null;
+
+    #[ORM\Column(length: 30)]
+    private ?string $shippingZipCode = null;
 
     public function __construct()
     {
@@ -60,12 +76,12 @@ class Order
         return $this;
     }
 
-    public function getStatus(): ?string
+    public function getStatus(): ?OrderStatus
     {
         return $this->status;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(OrderStatus $status): static
     {
         $this->status = $status;
 
@@ -134,6 +150,66 @@ class Order
                 $orderItem->setProductOrder(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getShippingLine1(): ?string
+    {
+        return $this->shippingLine1;
+    }
+
+    public function setShippingLine1(string $shippingLine1): static
+    {
+        $this->shippingLine1 = $shippingLine1;
+
+        return $this;
+    }
+
+    public function getShippingLine2(): ?string
+    {
+        return $this->shippingLine2;
+    }
+
+    public function setShippingLine2(string $shippingLine2): static
+    {
+        $this->shippingLine2 = $shippingLine2;
+
+        return $this;
+    }
+
+    public function getShippingCity(): ?string
+    {
+        return $this->shippingCity;
+    }
+
+    public function setShippingCity(string $shippingCity): static
+    {
+        $this->shippingCity = $shippingCity;
+
+        return $this;
+    }
+
+    public function getShippingCountry(): ?string
+    {
+        return $this->shippingCountry;
+    }
+
+    public function setShippingCountry(string $shippingCountry): static
+    {
+        $this->shippingCountry = $shippingCountry;
+
+        return $this;
+    }
+
+    public function getShippingZipCode(): ?string
+    {
+        return $this->shippingZipCode;
+    }
+
+    public function setShippingZipCode(string $shippingZipCode): static
+    {
+        $this->shippingZipCode = $shippingZipCode;
 
         return $this;
     }
