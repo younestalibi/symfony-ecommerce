@@ -8,6 +8,7 @@ use App\Entity\CartItem;
 use App\Entity\Product;
 use App\Enum\CartStatus;
 use App\Repository\CartRepository;
+use App\Service\CartService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,22 +19,19 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CartController extends AbstractController
 {
     #[Route('/', name: 'app_frontend_cart')]
-    public function index(CartRepository $cartRepository): Response
+    public function index(CartService $cartService): Response
     {
         /** @var User $user */
         $user = $this->getUser();
-        $activeCart = $cartRepository->findOneBy([
-            'user' => $user,
-            'status' => CartStatus::ACTIVE,
-        ]);
+        $cart = $cartService->getActiveCart($user);
 
         return $this->render('frontend/cart/index.html.twig', [
-            'cart' => $activeCart,
+            'cart' => $cart,
         ]);
     }
 
     #[Route('/add/{productId}', name: 'app_frontend_cart_add', methods: ['POST'])]
-    public function addToCart(int $productId, EntityManagerInterface $em, CartRepository $cartRepository): Response
+    public function addToCart(int $productId, CartService $cartService, EntityManagerInterface $em): Response
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -44,66 +42,31 @@ final class CartController extends AbstractController
             return $this->redirectToRoute('app_frontend_product_show', ['productId' => $productId]);
         }
 
-        // Check if the user has a cart
-        /** @var User $user */
-        $user = $this->getUser();
-        $cart = $cartRepository->findOneBy([
-            'user' => $user,
-            'status' => CartStatus::ACTIVE,
-        ]);;
-        if (!$cart) {
-            $cart = new Cart();
-            $cart->setUser($user);
-            $em->persist($cart);
-            $em->flush();
+        try {
+            $cartService->addProductToCart($user, $product);
+            $this->addFlash('success', 'Product added to cart.');
+        } catch (\RuntimeException $e) {
+            $this->addFlash('error', $e->getMessage());
         }
-
-        // Check if the product already exists in the cart        
-        $cartItem = $cart->findItemByProductId($productId);
-
-        // If the item doesn't exists, create a new cart item
-        if (is_null($cartItem)) {
-            if ($product->getQuantity() < 1) {
-                $this->addFlash('error', 'Not enough stock available.');
-                return $this->redirectToRoute('app_frontend_product_show', ['productId' => $productId]);
-            }
-            $cartItem = new CartItem();
-            $cartItem->setProduct($product);
-            $cartItem->setQuantity(1);
-            $cart->addCartItem($cartItem);  // Add the cart item to the cart
-            $em->persist($cartItem);  // Persist the new cart item
-        }
-
-        // Persist changes and return to the cart page
-        $em->flush();
 
         return $this->redirectToRoute('app_frontend_cart');
     }
 
     #[Route('/item/{id}/update', name: 'app_frontend_cart_update', methods: ['POST'])]
-    public function update(Request $request, CartItem $item, EntityManagerInterface $em): Response
+    public function update(Request $request, CartItem $item, CartService $cartService): Response
     {
         $quantity = (int) $request->request->get('quantity', 1);
-
-        if ($quantity < 1) {
-            $item->getCart()->removeCartItem($item);
-        } else {
-            $item->setQuantity($quantity);
-        }
-
-        $em->flush();
+        $cartService->updateItemQuantity($item, $quantity);
 
         return $this->redirectToRoute('app_frontend_cart');
     }
 
     #[Route('/item/{id}/delete', name: 'app_frontend_cart_delete', methods: ['POST'])]
-    public function delete(Request $request, CartItem $item, EntityManagerInterface $em): Response
+    public function delete(Request $request, CartItem $item, CartService $cartService): Response
     {
         $submittedToken = $request->request->get('_token');
         if ($this->isCsrfTokenValid('delete' . $item->getId(), $submittedToken)) {
-            $item->getCart()->removeCartItem($item);
-            $em->remove($item);
-            $em->flush();
+            $cartService->removeItem($item);
             $this->addFlash('success', 'Item removed from cart.');
         }
         return $this->redirectToRoute('app_frontend_cart');
