@@ -7,7 +7,6 @@ use App\Entity\OrderItem;
 use App\Entity\User;
 use App\Enum\CartStatus;
 use App\Repository\AddressRepository;
-use App\Repository\CartItemRepository;
 use App\Repository\CartRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -73,6 +72,17 @@ final class CheckoutController extends AbstractController
         if (count($cartItems) === 0) {
             $this->addFlash('warning', 'Your cart is empty.');
             return $this->redirectToRoute('app_frontend_cart');
+        }
+        // check if quantity in stock is enough
+        foreach ($cartItems as $cartItem) {
+            if ($cartItem->getQuantity() > $cartItem->getProduct()->getQuantity()) {
+                $this->addFlash('danger', sprintf(
+                    'Not enough stock for product %s. Available: %d',
+                    $cartItem->getProduct()->getName(),
+                    $cartItem->getProduct()->getQuantity()
+                ));
+                return $this->redirectToRoute('app_frontend_cart');
+            }
         }
 
         $order = new Order();
