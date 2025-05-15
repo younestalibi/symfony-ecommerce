@@ -2,11 +2,14 @@
 
 namespace App\Controller\Frontend;
 
+use App\Enum\OrderStatus;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Checkout\Session;
 use Stripe\Stripe;
+use Stripe\Webhook;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -98,5 +101,50 @@ final class PaymentController extends AbstractController
     {
         $this->addFlash('error', 'Payment was canceled.');
         return $this->redirectToRoute('app_frontend_cart');
+    }
+
+    #[Route('/webhook', name: 'app_payment_webhook', methods: ['POST'])]
+    public function webhook(
+        Request $request,
+        OrderRepository $orderRepository,
+        EntityManagerInterface $em
+    ): Response {
+        $payload = $request->getContent();
+        $sigHeader = $request->headers->get('stripe-signature');
+        $webhookSecret = $_ENV['STRIPE_WEBHOOK_SECRET'];
+
+        try {
+            $event = Webhook::constructEvent(
+                $payload,
+                $sigHeader,
+                $webhookSecret
+            );
+        } catch (\UnexpectedValueException $e) {
+            // Invalid payload
+            return new Response('Invalid payload', 400);
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            // Invalid signature
+            return new Response('Invalid signature', 400);
+        }
+
+        switch ($event->type) {
+            case 'checkout.session.completed':
+                // Handle successful payment
+                $session = $event->data->object;
+
+                // Get sesseion ID to get the order
+                $paymentIntentId = $session->id;
+
+                $order = $orderRepository->findOneBy([
+                    'paymentIntentId' => $paymentIntentId,
+                ]);
+
+                if ($order) {
+                    $order->setStatus(OrderStatus::PAID);
+                    $em->flush();
+                }
+                break;
+        }
+        return new Response('Webhook received', 200);
     }
 }
