@@ -10,43 +10,44 @@
 		</a>
 	</div>
 
-	<div class="overflow-x-auto rounded-lg shadow">
-		<table class="min-w-full divide-y divide-gray-200 bg-white">
-			<thead class="bg-gray-50">
-				<tr>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Image</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
-					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-				</tr>
-			</thead>
-			<tbody class="divide-y divide-gray-100">
-				{% for product in products %}
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-4 text-sm text-gray-700">{{ product.id }}</td>
-						<td class="px-6 py-4 text-sm text-gray-700">
-							<img class='size-13 aspect-square' src="{{ asset('uploads/' ~ product.image) }}" alt="{{ product.name }} image"/>
-						</td>
-						<td class="px-6 py-4 text-sm text-gray-700">{{ product.name }}</td>
-						<td class="px-6 py-4 text-sm text-gray-700">{{ product.description }}</td>
-						<td class="px-6 py-4 text-sm text-gray-700">{{ product.price }}</td>
-						<td class="px-6 py-4 text-sm text-gray-700">{{ product.quantity }}</td>
-						<td class="px-6 py-4 text-sm text-gray-700 space-x-2">
-							<a href="{{ path('app_admin_product_management_show', { id: product.id }) }}" class="text-indigo-600 hover:underline">Show</a>
-							<a href="{{ path('app_admin_product_management_edit', { id: product.id }) }}" class="text-green-600 hover:underline">Edit</a>
-						</td>
-					</tr>
-				{% else %}
-					<tr>
-						<td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-							No records found.
-						</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
-	</div>
+	{% set headers = ['ID', 'Image', 'Name', 'Description', 'Price', 'Quantity', 'Actions'] %}
+
+	{% set rows = [] %}
+	{% for product in products %}
+		{% set imageHtml = '<img class="size-13 aspect-square" src="' ~ asset('uploads/' ~ product.image) ~ '" alt="' ~ product.name ~ ' image"/>' %}
+
+		{% set actions %}
+		<a href="{{ path('app_admin_product_management_show', { id: product.id }) }}" class="text-indigo-600 hover:underline">Show</a>
+		<a href="{{ path('app_admin_product_management_edit', { id: product.id }) }}" class="text-green-600 hover:underline ml-2">Edit</a>
+		{% endset %}
+
+		{% set row = [
+      { value: product.id },
+      { value: imageHtml, is_html: true },
+      { value: product.name },
+      { value: product.description },
+      { value: product.price },
+      { value: product.quantity },
+      { value: actions|raw, is_html: true }
+    ] %}
+
+		{% set rows = rows|merge([row]) %}
+	{% else %}
+		{% set rows = [
+      [
+        { value: 'No records found.', is_html: false },
+        { value: '', is_html: false },
+        { value: '', is_html: false },
+        { value: '', is_html: false },
+        { value: '', is_html: false },
+        { value: '', is_html: false },
+        { value: '', is_html: false }
+      ]
+    ] %}
+	{% endfor %}
+
+	{% include 'frontend/components/_table.html.twig' with {
+    headers: headers,
+    rows: rows
+  } %}
 {% endblock %}

@@ -1,0 +1,28 @@
+{# templates/components/_table.html.twig #}
+<div class="overflow-x-auto rounded border border-gray-300 shadow-sm">
+	<table class="min-w-full divide-y-2 divide-gray-200">
+		<thead class="ltr:text-left rtl:text-right">
+			<tr class="*:font-medium *:text-gray-900">
+				{% for header in headers %}
+					<th class="px-3 py-2 whitespace-nowrap">{{ header }}</th>
+				{% endfor %}
+			</tr>
+		</thead>
+
+		<tbody class="divide-y divide-gray-200">
+			{% for row in rows %}
+				<tr class="*:text-gray-900 *:first:font-medium">
+					{% for cell in row %}
+						<td class="px-3 py-2 whitespace-nowrap">
+							{% if cell.is_html ?? false %}
+								{{ cell.value|raw }}
+							{% else %}
+								{{ cell.value }}
+							{% endif %}
+						</td>
+					{% endfor %}
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
