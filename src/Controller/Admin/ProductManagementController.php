@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Product;
 use App\Form\ProductForm;
 use App\Repository\ProductRepository;
+use App\Service\ProductService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,17 +24,20 @@ final class ProductManagementController extends AbstractController
     }
 
     #[Route('/new', name: 'app_admin_product_management_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, ProductService $productService): Response
     {
         $product = new Product();
         $form = $this->createForm(ProductForm::class, $product);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('image')->getData();
+            $productService->handleProductImage($product, $imageFile, $this->getParameter('uploads_directory'));
+
             $entityManager->persist($product);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_admin_product_management_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_admin_product_management_index');
         }
 
         return $this->render('admin/product_management/new.html.twig', [
@@ -51,15 +55,18 @@ final class ProductManagementController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_admin_product_management_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Product $product, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Product $product, EntityManagerInterface $entityManager, ProductService $productService): Response
     {
         $form = $this->createForm(ProductForm::class, $product);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $imageFile = $form->get('image')->getData();
+            $productService->handleProductImage($product, $imageFile, $this->getParameter('uploads_directory'));
+
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_admin_product_management_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_admin_product_management_index');
         }
 
         return $this->render('admin/product_management/edit.html.twig', [
@@ -68,14 +75,20 @@ final class ProductManagementController extends AbstractController
         ]);
     }
 
+
     #[Route('/{id}', name: 'app_admin_product_management_delete', methods: ['POST'])]
-    public function delete(Request $request, Product $product, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Product $product, EntityManagerInterface $entityManager, ProductService $productService): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$product->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $product->getId(), $request->getPayload()->getString('_token'))) {
+            $image = $product->getImage();
+            if ($image) {
+                $productService->removeImage($image, $this->getParameter('uploads_directory'));
+            }
+
             $entityManager->remove($product);
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_admin_product_management_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_admin_product_management_index');
     }
 }

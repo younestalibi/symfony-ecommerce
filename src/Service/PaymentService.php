@@ -42,9 +42,11 @@ final class PaymentService
             ];
         }, $order->getOrderItems()->getValues());
 
-        $successUrl = $this->urlGenerator->generate($successRoute, [
-            'reference' => $order->getReference(),
-        ], UrlGeneratorInterface::ABSOLUTE_URL) . '?session_id={CHECKOUT_SESSION_ID}';
+        $successUrl = $this->urlGenerator->generate(
+            $successRoute,
+            ['reference' => $order->getReference()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
 
         $cancelUrl = $this->urlGenerator->generate($cancelRoute, [
             'reference' => $order->getReference(),

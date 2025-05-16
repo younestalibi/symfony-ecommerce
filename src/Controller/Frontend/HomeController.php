@@ -11,14 +11,11 @@ use Symfony\Component\Routing\Attribute\Route;
 final class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_frontend_home')]
-    public function index(ProductRepository $productRepository, CategoryRepository $categoryRepository): Response
+    public function index(ProductRepository $productRepository): Response
     {
-        // Get all products and categories
         $products = $productRepository->findAll();
-        $categories = $categoryRepository->findAll();
         return $this->render('frontend/home/index.html.twig', [
             'products' => $products,
-            'categories' => $categories,
         ]);
     }
 }

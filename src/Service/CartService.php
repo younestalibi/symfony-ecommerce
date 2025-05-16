@@ -25,7 +25,7 @@ class CartService
         ]);
     }
 
-    public function addProductToCart(User $user, Product $product): void
+    public function addProductToCart(User $user, Product $product,int $quantity): void
     {
         $cart = $this->getActiveCart($user);
 
@@ -34,16 +34,16 @@ class CartService
             $cart->setUser($user);
             $this->em->persist($cart);
         }
+        // check if the product is already in the cart
+        $existingCartItem = $cart->findItemByProductId($product->getId());
 
-        $cartItem = $cart->findItemByProductId($product->getId());
-
-        if (is_null($cartItem)) {
+        if (is_null($existingCartItem)) {
             if ($product->getQuantity() < 1) {
                 throw new \RuntimeException('Not enough stock available.');
             }
             $cartItem = new CartItem();
             $cartItem->setProduct($product);
-            $cartItem->setQuantity(1);
+            $cartItem->setQuantity($quantity);
             $cart->addCartItem($cartItem);
             $this->em->persist($cartItem);
         }

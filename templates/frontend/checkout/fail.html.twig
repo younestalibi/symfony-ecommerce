@@ -1,0 +1,14 @@
+{% extends 'layout/user.html.twig' %}
+
+{% block title %}Payment failed
+{% endblock %}
+
+{% block main_content %}
+<div class="min-h-screen flex items-center justify-center bg-red-100">
+    <div class="text-center">
+        <h1 class="text-3xl font-bold text-red-700">Payment Failed</h1>
+        <p class="mt-4 text-gray-700">Something went wrong. Please try again.</p>
+        <a href="{{ path('app_frontend_cart') }}" class="mt-6 inline-block bg-red-600 text-white px-4 py-2 rounded">Go Back to Cart</a>
+    </div>
+</div>
+{% endblock %}

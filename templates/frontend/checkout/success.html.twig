@@ -1,0 +1,16 @@
+{% extends 'layout/user.html.twig' %}
+
+{% block title %}Payment success{% endblock %}
+
+{% block main_content %}
+<div class="min-h-screen flex items-center justify-center bg-green-100">
+    <div class="text-center">
+        <h1 class="text-3xl font-bold text-green-700">Payment Successful!</h1>
+        <p class="mt-4 text-gray-700">Thank you for your purchase.</p>
+        {% if reference %}
+            <p class="mt-2 text-sm text-gray-600">Order Reference: <strong>{{ reference }}</strong></p>
+        {% endif %}
+        <a href="{{ path('app_frontend_home') }}" class="mt-6 inline-block bg-green-600 text-white px-4 py-2 rounded">Return Home</a>
+    </div>
+</div>
+{% endblock %}

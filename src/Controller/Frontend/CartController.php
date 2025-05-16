@@ -19,22 +19,17 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CartController extends AbstractController
 {
     #[Route('/', name: 'app_frontend_cart')]
-    public function index(CartService $cartService): Response
+    public function index(): Response
     {
-        /** @var User $user */
-        $user = $this->getUser();
-        $cart = $cartService->getActiveCart($user);
-
-        return $this->render('frontend/cart/index.html.twig', [
-            'cart' => $cart,
-        ]);
+        return $this->render('frontend/cart/index.html.twig');
     }
 
     #[Route('/add/{productId}', name: 'app_frontend_cart_add', methods: ['POST'])]
-    public function addToCart(int $productId, CartService $cartService, EntityManagerInterface $em): Response
+    public function addToCart(int $productId, Request $request, CartService $cartService, EntityManagerInterface $em): Response
     {
         /** @var User $user */
         $user = $this->getUser();
+        $quantity = (int) $request->request->get('quantity', 1);
         $product = $em->getRepository(Product::class)->find($productId);
 
         if (!$product) {
@@ -43,12 +38,11 @@ final class CartController extends AbstractController
         }
 
         try {
-            $cartService->addProductToCart($user, $product);
+            $cartService->addProductToCart($user, $product, $quantity);
             $this->addFlash('success', 'Product added to cart.');
         } catch (\RuntimeException $e) {
             $this->addFlash('error', $e->getMessage());
         }
-
         return $this->redirectToRoute('app_frontend_cart');
     }
 

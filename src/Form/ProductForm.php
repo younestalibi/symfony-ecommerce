@@ -6,11 +6,13 @@ use App\Entity\Category;
 use App\Entity\Product;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class ProductForm extends AbstractType
 {
@@ -41,6 +43,20 @@ class ProductForm extends AbstractType
                 'choice_label' => 'name',
                 'attr' => ['class' => $fieldClass],
                 'label_attr' => ['class' => $labelClass],
+            ])
+            ->add('image', FileType::class, [
+                'attr' => ['class' => $fieldClass],
+                'label_attr' => ['class' => $labelClass],
+                'label' => 'Book Cover (JPEG or PNG)',
+                'mapped' => false,
+                'required' => true,  // this forces upload in the form
+                'constraints' => [
+                    new File([
+                        'maxSize' => '2M',
+                        'mimeTypes' => ['image/jpeg', 'image/png'],
+                        'mimeTypesMessage' => 'Please upload a valid image (JPEG or PNG)',
+                    ])
+                ],
             ]);
     }
 

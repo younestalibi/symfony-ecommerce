@@ -34,17 +34,17 @@ final class PaymentController extends AbstractController
 
 
     #[Route('/success/{reference}', name: 'app_payment_success')]
-    public function success(): Response
+    public function success($reference): Response
     {
-        $this->addFlash('success', 'Payment completed successfully!');
-        return $this->redirectToRoute('app_frontend_cart');
+        return $this->render('frontend/checkout/success.html.twig', [
+            'reference' => $reference,
+        ]);
     }
 
     #[Route('/cancel', name: 'app_payment_cancel')]
     public function cancel(): Response
     {
-        $this->addFlash('error', 'Payment was canceled.');
-        return $this->redirectToRoute('app_frontend_cart');
+        return $this->render('frontend/checkout/fail.html.twig');
     }
 
     #[Route('/webhook', name: 'app_payment_webhook', methods: ['POST'])]
