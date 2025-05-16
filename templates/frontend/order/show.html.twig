@@ -1,58 +1,41 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout/user.html.twig' %}
 
-{% block title %}Order{% endblock %}
+{% block title %}Order details
+{% endblock %}
 
-{% block body %}
-    <h1>Order</h1>
+{% block main_content %}
+	<div class="flex items-center justify-between mb-6">
+		<h1 class="text-2xl font-semibold text-gray-800">Order Details</h1>
+	</div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ order.id }}</td>
-            </tr>
-            <tr>
-                <th>Status</th>
-                <td>{{ order.status }}</td>
-            </tr>
-            <tr>
-                <th>Total</th>
-                <td>{{ order.total }}</td>
-            </tr>
-            <tr>
-                <th>PaymentIntentId</th>
-                <td>{{ order.paymentIntentId }}</td>
-            </tr>
-            <tr>
-                <th>Reference</th>
-                <td>{{ order.reference }}</td>
-            </tr>
-            <tr>
-                <th>ShippingLine1</th>
-                <td>{{ order.shippingLine1 }}</td>
-            </tr>
-            <tr>
-                <th>ShippingLine2</th>
-                <td>{{ order.shippingLine2 }}</td>
-            </tr>
-            <tr>
-                <th>ShippingCity</th>
-                <td>{{ order.shippingCity }}</td>
-            </tr>
-            <tr>
-                <th>ShippingCountry</th>
-                <td>{{ order.shippingCountry }}</td>
-            </tr>
-            <tr>
-                <th>ShippingZipCode</th>
-                <td>{{ order.shippingZipCode }}</td>
-            </tr>
-        </tbody>
-    </table>
+	{# Format order items as an HTML list #}
+	{% set items %}
+	<ul class="list-disc pl-5">
+		{% for item in order.orderItems %}
+			<li>{{ item.product.name }}
+				×
+				{{ item.quantity }}</li>
+		{% endfor %}
+	</ul>
+	{% endset %}
 
-    <a href="{{ path('app_frontend_order_index') }}">back to list</a>
+	{% set total %}
+	<b>{{ order.total ~' '~ order.currency.value}}</b>
+	{% endset %}
+	{% set details = [
+    { label: 'Created At', value: order.createdAt|date('Y-m-d H:i:s') },    
+	{ label: 'Reference', value: order.reference },
+	{ label: 'Status', value: order.status.value },
+    { label: 'Shipping Line 1', value: order.shippingLine1 },
+    { label: 'Shipping Line 2', value: order.shippingLine2 },
+    { label: 'Shipping City', value: order.shippingCity },
+    { label: 'Shipping Country', value: order.shippingCountry },
+    { label: 'Shipping Zip Code', value: order.shippingZipCode },
+	{ label: 'Products', value: items},
+	{ label: 'Total', value: total  },
+] %}
 
-    <a href="{{ path('app_frontend_order_edit', {'id': order.id}) }}">edit</a>
+	{{ include('components/_detail_list.html.twig', { items: details }) }}
 
-    {{ include('frontend/order/_delete_form.html.twig') }}
+	<a href="{{ path('app_frontend_order_index') }}">back to list</a>
 {% endblock %}

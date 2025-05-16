@@ -1,51 +1,54 @@
-{% extends 'base.html.twig' %}
+{% extends 'layout/user.html.twig' %}
 
-{% block title %}Order index{% endblock %}
+{% block title %}List of Orders
+{% endblock %}
 
-{% block body %}
-    <h1>Order index</h1>
+{% block main_content %}
+	<div class="flex items-center justify-between mb-6">
+		<h1 class="text-2xl font-semibold text-gray-800">My Orders</h1>
+	</div>
+	{% set headers = [
+        'Reference','Status', 'Created at','Product','Total',
+        'ShippingLine1', 'Actions'
+    ] %}
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Status</th>
-                <th>Total</th>
-                <th>PaymentIntentId</th>
-                <th>Reference</th>
-                <th>ShippingLine1</th>
-                <th>ShippingLine2</th>
-                <th>ShippingCity</th>
-                <th>ShippingCountry</th>
-                <th>ShippingZipCode</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for order in orders %}
-            <tr>
-                <td>{{ order.id }}</td>
-                <td>{{ order.status }}</td>
-                <td>{{ order.total }}</td>
-                <td>{{ order.paymentIntentId }}</td>
-                <td>{{ order.reference }}</td>
-                <td>{{ order.shippingLine1 }}</td>
-                <td>{{ order.shippingLine2 }}</td>
-                <td>{{ order.shippingCity }}</td>
-                <td>{{ order.shippingCountry }}</td>
-                <td>{{ order.shippingZipCode }}</td>
-                <td>
-                    <a href="{{ path('app_frontend_order_show', {'id': order.id}) }}">show</a>
-                    <a href="{{ path('app_frontend_order_edit', {'id': order.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="11">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+	{% set rows = [] %}
+	{% for order in orders %}
+		{% set actions %}
+		<a href="{{ path('app_frontend_order_show', {'id': order.id}) }}" class="text-blue-600 underline">show</a>
+		{% endset %}
 
-    <a href="{{ path('app_frontend_order_new') }}">Create new</a>
+		{# Format order items as an HTML list #}
+		{% set items %}
+		<ul class="list-disc pl-5">
+			{% for item in order.orderItems %}
+				<li>{{ item.product.name }}
+					×
+					{{ item.quantity }}</li>
+			{% endfor %}
+		</ul>
+		{% endset %}
+
+		{% set row = [
+		{ value: order.reference },
+		{ value: order.status.value },
+        {value: order.createdAt|date('Y-m-d H:i:s') },
+		{ value: items|raw, is_html: true },
+		{ value: order.total ~' '~ order.currency.value },
+		{ value: order.shippingLine1 },
+		{ value: actions|raw, is_html: true }
+	] %}
+
+		{% set rows = rows|merge([row]) %}
+	{% else %}
+		{% set rows = [
+		[
+			{ value: 'No records found', is_html: false, colspan: 6 }
+		]
+	] %}
+	{% endfor %}
+
+
+	{{ include('components/_table.html.twig', {headers: headers, rows: rows}) }}
+
 {% endblock %}

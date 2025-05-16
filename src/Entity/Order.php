@@ -2,14 +2,18 @@
 
 namespace App\Entity;
 
+use App\Enum\Currency;
 use App\Enum\OrderStatus;
 use App\Repository\OrderRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\HasLifecycleCallbacks;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
 #[ORM\Table(name: '`order`')]
+#[HasLifecycleCallbacks]
 class Order
 {
     #[ORM\Id]
@@ -53,6 +57,15 @@ class Order
 
     #[ORM\Column(length: 30)]
     private ?string $shippingZipCode = null;
+
+    #[ORM\Column(enumType: Currency::class)]
+    private ?Currency $currency = null;
+
+    #[ORM\Column]
+    private ?DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
@@ -212,5 +225,41 @@ class Order
         $this->shippingZipCode = $shippingZipCode;
 
         return $this;
+    }
+
+    public function getCurrency(): ?Currency
+    {
+        return $this->currency;
+    }
+
+    public function setCurrency(Currency $currency): static
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    // -- Lifecycle callback to create update updatedAt/createdAt on create
+    #[ORM\PrePersist]
+    public function setCreatedAt(): void
+    {
+        $this->createdAt = new DateTimeImmutable();
+        $this->setUpdatedAt();
+    }
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+    // -- Lifecycle callback to  update updatedAt on update
+    #[ORM\PreUpdate]
+    public function setUpdatedAt(): void
+    {
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }
