@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Order{% endblock %}
+
+{% block body %}
+    <h1>Order</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ order.id }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ order.status }}</td>
+            </tr>
+            <tr>
+                <th>Total</th>
+                <td>{{ order.total }}</td>
+            </tr>
+            <tr>
+                <th>PaymentIntentId</th>
+                <td>{{ order.paymentIntentId }}</td>
+            </tr>
+            <tr>
+                <th>Reference</th>
+                <td>{{ order.reference }}</td>
+            </tr>
+            <tr>
+                <th>ShippingLine1</th>
+                <td>{{ order.shippingLine1 }}</td>
+            </tr>
+            <tr>
+                <th>ShippingLine2</th>
+                <td>{{ order.shippingLine2 }}</td>
+            </tr>
+            <tr>
+                <th>ShippingCity</th>
+                <td>{{ order.shippingCity }}</td>
+            </tr>
+            <tr>
+                <th>ShippingCountry</th>
+                <td>{{ order.shippingCountry }}</td>
+            </tr>
+            <tr>
+                <th>ShippingZipCode</th>
+                <td>{{ order.shippingZipCode }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_frontend_order_index') }}">back to list</a>
+
+    <a href="{{ path('app_frontend_order_edit', {'id': order.id}) }}">edit</a>
+
+    {{ include('frontend/order/_delete_form.html.twig') }}
+{% endblock %}

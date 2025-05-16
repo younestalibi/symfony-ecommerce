@@ -1,20 +1,26 @@
 {% extends 'layout/user.html.twig' %}
 
-{% block title %}List of Addresses{% endblock %}
+{% block title %}List of Addresses
+{% endblock %}
 
 {% block main_content %}
-    <h1>Address List</h1>
+	<div class="flex items-center justify-between mb-6">
+		<h1 class="text-2xl font-semibold text-gray-800">Address List</h1>
+		<a href="{{ path('app_frontend_address_new') }}" class="inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition">
+			+ Create New
+		</a>
+	</div>
 
-    {% set headers = ['Id', 'Line1', 'Line2', 'City', 'Country', 'ZipCode', 'IsDefault', 'Actions'] %}
+	{% set headers = ['Id', 'Line1', 'Line2', 'City', 'Country', 'ZipCode', 'IsDefault', 'Actions'] %}
 
-    {% set rows = [] %}
-    {% for address in addresses %}
-        {% set actions %}
-            <a href="{{ path('app_frontend_address_show', {'id': address.id}) }}" class="text-blue-600 underline">show</a>
-            <a href="{{ path('app_frontend_address_edit', {'id': address.id}) }}" class="text-blue-600 underline ml-2">edit</a>
-        {% endset %}
+	{% set rows = [] %}
+	{% for address in addresses %}
+		{% set actions %}
+		<a href="{{ path('app_frontend_address_show', {'id': address.id}) }}" class="text-blue-600 underline">show</a>
+		<a href="{{ path('app_frontend_address_edit', {'id': address.id}) }}" class="text-blue-600 underline ml-2">edit</a>
+		{% endset %}
 
-        {% set row = [
+		{% set row = [
             { value: address.id },
             { value: address.line1 },
             { value: address.line2 },
@@ -25,9 +31,9 @@
             { value: actions|raw, is_html: true }
         ] %}
 
-        {% set rows = rows|merge([row]) %}
-    {% else %}
-        {% set rows = [
+		{% set rows = rows|merge([row]) %}
+	{% else %}
+		{% set rows = [
             [
                 { value: 'No records found', is_html: false },
                 { value: '', is_html: false },
@@ -39,12 +45,10 @@
                 { value: '', is_html: false },
             ]
         ] %}
-    {% endfor %}
+	{% endfor %}
 
-    {% include 'frontend/components/_table.html.twig' with {
+	{% include 'frontend/components/_table.html.twig' with {
         headers: headers,
         rows: rows
     } %}
-
-    <a href="{{ path('app_frontend_address_new') }}" class="inline-block mt-4 bg-blue-600 text-white px-4 py-2 rounded">Create new</a>
 {% endblock %}

@@ -85,8 +85,7 @@
 			<a href='#' class="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
 
 				{% for category in get_categories() %}
-					<div class="border-2 border-yellow-400 rounded flex items-center justify-center h-32 text-xl font-semibold text-center
-																																																																																																		                  transition transform hover:border-yellow-600 hover:bg-yellow-100 hover:scale-105">
+					<div class="border-2 border-yellow-400 rounded flex items-center justify-center h-32 text-xl font-semibold text-center transition transform hover:border-yellow-600 hover:bg-yellow-100 hover:scale-105">
 						{{ category.name }}
 					</div>
 				{% endfor %}

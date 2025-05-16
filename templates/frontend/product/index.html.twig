@@ -12,7 +12,7 @@
 
 				<p class="mt-4 max-w-md text-gray-500">
 					Lorem ipsum, dolor sit amet consectetur adipisicing elit. Itaque praesentium cumque iure
-																																																																						        dicta incidunt est ipsam, officia dolor fugit natus?
+																																																																																        dicta incidunt est ipsam, officia dolor fugit natus?
 				</p>
 			</header>
 
@@ -30,7 +30,10 @@
 
 			<div class="mt-4 lg:mt-8 lg:grid lg:grid-cols-4 lg:items-start lg:gap-8">
 				<div class="hidden space-y-4 lg:block">
-					<form method="get" action="{{ path('app_frontend_product') }}">
+					<form
+						method="get" action="{{ path('app_frontend_product') }}">
+						<!-- this hidden input is used to keep track of the query search-->
+						<input type="hidden" name="q" value="{{ search }}"/>
 
 						<div>
 							<label for="SortBy" class="block text-xs font-medium text-gray-700">
@@ -61,20 +64,9 @@
 										</span>
 									</summary>
 
+
 									<div class="border-t border-gray-200 bg-white">
-										<header class="flex items-center justify-between p-4">
-											<span class="text-sm text-gray-700">
-												0 Selected
-											</span>
-
-											<button type="button" class="text-sm text-gray-900 underline underline-offset-4">
-												Reset
-											</button>
-										</header>
-
 										<ul class="space-y-1 border-t border-gray-200 p-4">
-
-
 											<p>Availability</p>
 											<label for="FilterAll" class="inline-flex items-center gap-2">
 												<input type="radio" id="FilterAll" class="size-5 rounded-sm border-gray-300 shadow-sm" name="availability" value="" {% if filters.availability is empty %} checked {% endif %}>

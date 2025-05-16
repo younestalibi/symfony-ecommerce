@@ -22,7 +22,7 @@ final class ProductController extends AbstractController
         $sort = $request->query->get('sort', null); // e.g. 'price_desc'
         $search = $request->query->get('q', null);
 
-        $products = $productRepository->findByFiltersAndSort($filters, $sort);
+        $products = $productRepository->findByFiltersAndSort($filters, $sort,$search);
     
         return $this->render('frontend/product/index.html.twig', [
             'products' => $products,
