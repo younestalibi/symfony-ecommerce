@@ -17,6 +17,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class PaymentService
 {
+
+    private const ADMIN_EMAIL = 'younessetalibi11@gmail.com';
+
     public function __construct(
         private OrderRepository $orderRepository,
         private CartRepository $cartRepository,
@@ -24,6 +27,7 @@ final class PaymentService
         private LoggerInterface $logger,
         private UrlGeneratorInterface $urlGenerator,
         private CurrencyContext $currency,
+        private MailService $mailService,
     ) {}
 
     public function createStripeSession(User $user, Order $order, string $successRoute, string $cancelRoute): Session
@@ -78,16 +82,17 @@ final class PaymentService
             throw new \RuntimeException('Stripe webhook error: ' . $e->getMessage());
         }
 
-        $this->logger->info('Stripe Webhook Event', ['event' => $event]);
+        $this->logger->info('Stripe Webhook Event', ['event' => $event->type]);
 
         // Handle successful payment
         if ($event->type === 'checkout.session.completed') {
             /** @var Session $session */
             $session = $event->data->object;
 
-            $order = $this->orderRepository->findOneBy([
-                'paymentIntentId' => $session->id,
-            ]);
+            $order = $this->orderRepository->findOneBy(['paymentIntentId' => $session->id]);
+
+            $this->logger->info('Stripe Webhook Event order', ['status' => $order->getStatus(), 'session' => $session->id, 'order' => (array) $order]);
+
 
             if (!$order || $order->getStatus() === OrderStatus::PAID) {
                 return;
@@ -95,23 +100,49 @@ final class PaymentService
 
             $order->setStatus(OrderStatus::PAID);
 
+            $this->mailService->sendEmail(
+                (string)self::ADMIN_EMAIL,
+                'Your Have A New Order',
+                'email/admin_new_order.html.twig',
+                ['order' => $order]
+            );
+
+            if ($order->getUser()) {
+                $this->mailService->sendEmail(
+                    (string)$order->getUser()->getEmail(),
+                    'Your Payment Received for Your Order!',
+                    'email/user_order_success.html.twig',
+                    ['order' => $order]
+                );
+            }
+
+
             $cart = $this->cartRepository->findOneBy([
                 'user' => $order->getUser(),
                 'status' => CartStatus::ACTIVE,
             ]);
 
+            $this->logger->info('Stripe cart', ['cart' => $cart]);
+            $this->logger->info('Stripe order', ['order' => $order->getUser()]);
+
             if ($cart) {
                 $cart->setStatus(CartStatus::COMPLETED);
             }
 
-            // reduce product quantities
+            // reduce product quantities and notify admin if any product is too low to satisfy order
+            $lowStockItems = [];
             foreach ($order->getOrderItems() as $item) {
                 $product = $item->getProduct();
                 $available = $product->getQuantity();
                 $requested = $item->getQuantity();
 
                 if ($requested > $available) {
-                    //send email or notification to admin for low stock
+                    $lowStockItems[] = [
+                        'product' => $product,
+                        'requested' => $requested,
+                        'available' => $available,
+                    ];
+
                     $this->logger->error('Not enough product quantity', [
                         'product' => $product->getName(),
                         'requested' => $requested,
@@ -121,6 +152,16 @@ final class PaymentService
 
                 $product->setQuantity(max(0, $available - $requested));
             }
+
+            if (!empty($lowStockItems)) {
+                $this->mailService->sendEmail(
+                    self::ADMIN_EMAIL,
+                    '⚠ Low Stock Warning – Multiple Products',
+                    'email/admin_stock_alert.html.twig',
+                    ['lowStockItems' => $lowStockItems]
+                );
+            }
+
 
             $this->em->flush();
         }

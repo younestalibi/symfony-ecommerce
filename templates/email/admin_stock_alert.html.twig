@@ -1,0 +1,32 @@
+<h2>⚠ Stock Alert: Multiple Products</h2>
+
+<p>Dear Admin,</p>
+
+<p>The stock levels for the following products are too low to fulfill recent orders:</p>
+
+<table border="1" cellpadding="5" cellspacing="0" style="border-collapse: collapse;">
+	<thead>
+		<tr>
+			<th>Product Name</th>
+			<th>ID</th>
+			<th>Requested Quantity</th>
+			<th>Available Stock</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for item in lowStockItems %}
+			<tr>
+				<td>{{ item.product.name }}</td>
+				<td>{{ item.product.id }}</td>
+				<td>{{ item.requested }}</td>
+				<td>{{ item.available }}</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<p style="color: red;">
+	<strong>Action Required:</strong>
+	Please restock or disable these products to prevent overselling.</p>
+
+<p>Thank you,<br>Your Store System</p>
