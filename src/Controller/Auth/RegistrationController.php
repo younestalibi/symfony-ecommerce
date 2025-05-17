@@ -52,7 +52,7 @@ class RegistrationController extends AbstractController
                     ->from(new Address('admin@admin.com', 'Admin bot'))
                     ->to((string) $user->getEmail())
                     ->subject('Please Confirm your Email')
-                    ->htmlTemplate('auth/registration/confirmation_email.html.twig')
+                    ->htmlTemplate('email/confirmation_email.html.twig')
             );
 
             // do anything else you need here, like send an email
@@ -108,7 +108,7 @@ class RegistrationController extends AbstractController
                 ->from(new Address('admin@admin.com', 'Admin bot'))
                 ->to((string) $user->getEmail())
                 ->subject('Please Confirm your Email')
-                ->htmlTemplate('auth/registration/confirmation_email.html.twig')
+                ->htmlTemplate('email/confirmation_email.html.twig')
         );
 
         $this->addFlash('success', 'Verification email has been resent.');

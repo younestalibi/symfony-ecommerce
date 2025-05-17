@@ -15,7 +15,8 @@ class CheckoutService
     public function __construct(
         private CartRepository $cartRepository,
         private AddressRepository $addressRepository,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private MailService $mailService
     ) {}
 
     public function getActiveCartForUser(User $user): ?object
@@ -86,6 +87,7 @@ class CheckoutService
             $orderItem->setPrice($cartItem->getProduct()->getPrice());
             $orderItem->setProductName($cartItem->getProduct()->getName());
             $orderItem->setProductOrder($order);
+            $order->addOrderItem($orderItem);
 
             $this->entityManager->persist($orderItem);
 
@@ -96,6 +98,13 @@ class CheckoutService
 
         $this->entityManager->persist($order);
         $this->entityManager->flush();
+
+        $this->mailService->sendEmail(
+            (string) $user->getEmail(),
+            'Your Order Is Created Successfully',
+            'email/user_order_created.html.twig',
+            ['order' => $order]
+        );
 
         return $order;
     }

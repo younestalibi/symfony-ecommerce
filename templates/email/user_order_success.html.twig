@@ -1,0 +1,43 @@
+<h2>Payment Received for Your Order,
+	{{ order.user.email }}!</h2>
+
+<p>Good news! The payment for your order
+	<strong>#{{ order.reference }}</strong>
+	has been successfully processed on
+	{{ order.updatedAt ? order.updatedAt|date('F j, Y, H:i') : "N/A" }}.</p>
+
+<p>
+	<strong>Order Summary:</strong>
+</p>
+
+{% for item in order.orderItems %}
+	<p>
+		<strong>{{ item.productName }}</strong><br>
+		Quantity:
+		{{ item.quantity }}<br>
+		Price per item: ${{ item.price|number_format(2) }}<br>
+		Subtotal: ${{ (item.price * item.quantity)|number_format(2) }}
+	</p>
+	{% if not loop.last %}
+		<hr style="border:none; border-top:1px solid #ccc;">
+	{% endif %}
+{% endfor %}
+
+<p>
+	<strong>Total Paid:</strong>
+	${{ order.total|number_format(2) }}</p>
+
+<p>
+	<strong>Shipping Address:</strong><br/>
+	{{ order.shippingLine1 }}<br/>
+	{% if order.shippingLine2 %}
+		{{ order.shippingLine2 }}<br/>
+	{% endif %}
+	{{ order.shippingCity }},
+	{{ order.shippingCountry }}
+	{{ order.shippingZipCode }}
+</p>
+
+<p>Your order is now being prepared for shipment. We will notify you once it has been shipped.</p>
+
+<p>Thank you for your trust and for shopping with us!</p>

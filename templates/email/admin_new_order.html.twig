@@ -1,0 +1,33 @@
+<h2>New Order Received</h2>
+
+<p>Dear Admin,</p>
+
+<p>A new order has been placed on the store.</p>
+
+<p><strong>Order Reference:</strong> {{ order.reference }}<br>
+<strong>Placed By:</strong> {{ order.user.email }}<br>
+<strong>Date:</strong> {{ order.createdAt|date('F j, Y, H:i') }}</p>
+
+<p><strong>Order Items:</strong></p>
+{% for item in order.orderItems %}
+    <p>
+        • {{ item.productName }} — Quantity: {{ item.quantity }}, 
+        Unit Price: ${{ item.price|number_format(2) }}, 
+        Subtotal: ${{ (item.price * item.quantity)|number_format(2) }}
+    </p>
+    {% if not loop.last %}
+        <hr style="border:none; border-top:1px dashed #ccc;">
+    {% endif %}
+{% endfor %}
+
+<p><strong>Total:</strong> ${{ order.total|number_format(2) }}</p>
+
+<p><strong>Shipping Address:</strong><br/>
+    {{ order.shippingLine1 }}<br/>
+    {% if order.shippingLine2 %}{{ order.shippingLine2 }}<br/>{% endif %}
+    {{ order.shippingCity }}, {{ order.shippingCountry }} {{ order.shippingZipCode }}
+</p>
+
+<p>Please log in to the admin dashboard to view and process the order.</p>
+
+<p>Regards,<br/>Your Store System</p>

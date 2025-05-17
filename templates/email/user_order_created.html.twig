@@ -1,0 +1,43 @@
+<h2>Thank you for your order,
+	{{ order.user.email }}!</h2>
+
+<p>Your order
+	<strong>#{{ order.reference }}</strong>
+	was created successfully on
+	{{ order.createdAt|date('F j, Y, H:i') }}.</p>
+
+<p>
+	<strong>Order Details:</strong>
+</p>
+
+{% for item in order.orderItems %}
+	<p>
+		<strong>{{ item.productName }}</strong><br>
+		Quantity:
+		{{ item.quantity }}<br>
+		Price per item: ${{ item.price|number_format(2) }}<br>
+		Subtotal: ${{ (item.price * item.quantity)|number_format(2) }}
+	</p>
+	{% if not loop.last %}
+		<hr style="border:none; border-top:1px solid #ccc;">
+	{% endif %}
+{% endfor %}
+
+<p>
+	<strong>Total Amount:</strong>
+	${{ order.total|number_format(2) }}</p>
+
+<p>
+	<strong>Shipping Address:</strong><br/>
+	{{ order.shippingLine1 }}<br/>
+	{% if order.shippingLine2 %}
+		{{ order.shippingLine2 }}<br/>
+	{% endif %}
+	{{ order.shippingCity }},
+	{{ order.shippingCountry }}
+	{{ order.shippingZipCode }}
+</p>
+
+<p>We will notify you once your order is paid.</p>
+
+<p>Thanks for shopping with us!</p>
