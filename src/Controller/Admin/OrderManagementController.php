@@ -6,6 +6,7 @@ use App\Entity\Order;
 use App\Enum\OrderStatus;
 use App\Form\OrderForm;
 use App\Repository\OrderRepository;
+use App\Service\MailService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,11 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/order/management')]
 final class OrderManagementController extends AbstractController
 {
+
+    public function __construct(
+        private MailService $mailService,
+    ) {}
+
     #[Route(name: 'app_admin_order_management_index', methods: ['GET'])]
     public function index(OrderRepository $orderRepository): Response
     {
@@ -44,10 +50,16 @@ final class OrderManagementController extends AbstractController
             $order->setStatus(OrderStatus::from($request->request->get('status')));
             $em->flush();
             $this->addFlash('success', 'Status updated.');
+            $this->mailService->sendEmail(
+                (string)$order->getUser()->getEmail(),
+                'Your Order Status Has Been Updated',
+                'email/order_status_update.html.twig',
+                ['order' => $order]
+            );
         } catch (\ValueError $e) {
             $this->addFlash('error', 'Invalid status.');
         }
-    
+
         return $this->redirectToRoute('app_admin_order_management_index');
     }
 }

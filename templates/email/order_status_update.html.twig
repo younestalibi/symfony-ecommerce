@@ -1,0 +1,13 @@
+<h2>📦 Order Update</h2>
+
+<p>Dear
+	{{ order.user.email }},</p>
+
+<p>Your order
+	<strong>#{{ order.reference }}</strong>
+	is now
+	<strong>{{ order.status.value|capitalize }}</strong>.</p>
+
+<p>We will notify you if there are any further updates.</p>
+
+<p>Thank you for shopping with us!<br>Your Store Team</p>
