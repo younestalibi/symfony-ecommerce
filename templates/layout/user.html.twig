@@ -43,7 +43,11 @@
 							</button>
 
 							<div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-md z-10">
-								<a href="{{ path('app_frontend_address_index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">View address</a>
+							{% if is_granted('ROLE_ADMIN') %}
+								<a href="{{ path('app_admin_dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a>
+							{% endif %}
+
+								<a href="{{ path('app_frontend_address_index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Address</a>
 								<a href="{{ path('app_frontend_order_index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">My Orders</a>
 								<a href="{{ path('app_logout') }}" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
 							</div>
@@ -128,7 +132,7 @@
 
 					<p class="mt-4 max-w-xs text-gray-500">
 						Lorem ipsum dolor, sit amet consectetur adipisicing elit. Esse non cupiditate quae nam
-																																																																																										          molestias.
+																																																																																																          molestias.
 					</p>
 
 					<ul class="mt-8 flex gap-6">
@@ -248,4 +252,26 @@
 			<p class="text-xs text-gray-500">&copy; 2025. Ecommerce Symfony. All rights reserved.</p>
 		</div>
 	</footer>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+
+	document.addEventListener('DOMContentLoaded', function () {
+	    const toggle = document.getElementById('user-dropdown-toggle');
+	    const menu = document.getElementById('user-dropdown-menu');
+	
+	    toggle.addEventListener('click', function (e) {
+	      e.stopPropagation();
+	      menu.classList.toggle('hidden');
+	    });
+	
+	    document.addEventListener('click', function (e) {
+	      const dropdown = document.getElementById('user-dropdown-wrapper');
+	      if (!dropdown.contains(e.target)) {
+	        menu.classList.add('hidden');
+	      }
+	    });
+	  });
+</script>
 {% endblock %}

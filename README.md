@@ -37,7 +37,30 @@ composer install
 
 # Configurer les variables d'environnement
 cp .env .env.local
+
 # Modifier DATABASE_URL et MAILER_DSN et les clés STRIPE dans .env.local
+
+DATABASE_URL="mysql://utilisateur_bd:motdepasse_bd@127.0.0.1:3306/nom_bd"  
+# Remplacez par vos identifiants de base de données
+
+MAILER_DSN="smtp://utilisateur:motdepasse@serveurmail:port"  
+# Exemple : smtp://user:pass@smtp.exemple.com:587
+
+ADMIN_EMAIL="admin@exemple.com"  
+# Adresse email admin où vous recevrez les notifications
+
+NAME_EMAIL="NomDeVotreApp"  
+# Nom utilisé dans le champ expéditeur des emails
+
+STRIPE_SECRET_KEY="votre_clef_secrète_stripe_ici" 
+# À récupérer depuis votre tableau de bord Stripe
+
+STRIPE_PUBLIC_KEY="votre_clef_publique_stripe_ici"  
+# À récupérer depuis votre tableau de bord Stripe
+
+STRIPE_WEBHOOK_SECRET="votre_clef_webhook_stripe_ici" 
+# À récupérer dans les paramètres des webhooks Stripe
+
 
 # Créer la base de données et exécuter les migrations
 php bin/console doctrine:database:create
