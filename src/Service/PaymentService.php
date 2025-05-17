@@ -17,9 +17,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 final class PaymentService
 {
-
-    private const ADMIN_EMAIL = 'younessetalibi11@gmail.com';
-
     public function __construct(
         private OrderRepository $orderRepository,
         private CartRepository $cartRepository,
@@ -28,11 +25,18 @@ final class PaymentService
         private UrlGeneratorInterface $urlGenerator,
         private CurrencyContext $currency,
         private MailService $mailService,
-    ) {}
+        private string $adminEmail,
+        private string $stripeWebhookSecret,
+        private string $stripeSecretKey,
+    ) {
+        $this->adminEmail = $adminEmail ?: 'younessetalibi11@gmail.com';
+        $this->stripeWebhookSecret = $stripeWebhookSecret;
+        $this->stripeSecretKey = $stripeSecretKey;
+    }
 
     public function createStripeSession(User $user, Order $order, string $successRoute, string $cancelRoute): Session
     {
-        Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+        Stripe::setApiKey($this->stripeSecretKey);
 
         $lineItems = array_map(function ($orderItem) {
             return [
@@ -74,10 +78,8 @@ final class PaymentService
 
     public function handleStripeWebhook(string $payload, ?string $sigHeader): void
     {
-        $webhookSecret = $_ENV['STRIPE_WEBHOOK_SECRET'];
-
         try {
-            $event = Webhook::constructEvent($payload, $sigHeader, $webhookSecret);
+            $event = Webhook::constructEvent($payload, $sigHeader, $this->stripeWebhookSecret);
         } catch (\UnexpectedValueException | \Stripe\Exception\SignatureVerificationException $e) {
             throw new \RuntimeException('Stripe webhook error: ' . $e->getMessage());
         }
@@ -101,7 +103,7 @@ final class PaymentService
             $order->setStatus(OrderStatus::PAID);
 
             $this->mailService->sendEmail(
-                (string)self::ADMIN_EMAIL,
+                (string)$this->adminEmail,
                 'Your Have A New Order',
                 'email/admin_new_order.html.twig',
                 ['order' => $order]
@@ -155,7 +157,7 @@ final class PaymentService
 
             if (!empty($lowStockItems)) {
                 $this->mailService->sendEmail(
-                    self::ADMIN_EMAIL,
+                    (string)$this->adminEmail,
                     '⚠ Low Stock Warning – Multiple Products',
                     'email/admin_stock_alert.html.twig',
                     ['lowStockItems' => $lowStockItems]

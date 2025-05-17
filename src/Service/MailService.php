@@ -8,10 +8,12 @@ use Symfony\Component\Mime\Address;
 
 class MailService
 {
-    private const FROM_EMAIL = 'admin@admin.com';
-    private const FROM_NAME = 'Admin Bot';
 
-    public function __construct(private MailerInterface $mailer) {}
+    public function __construct(private MailerInterface $mailer, private string $adminEmail, private string $adminName)
+    {
+        $this->adminEmail = $adminEmail ?: 'younessetalibi11@gmail.com';
+        $this->adminName = $adminName ?: 'Younes';
+    }
 
     /**
      * Send a general templated email
@@ -28,7 +30,7 @@ class MailService
         array $context = []
     ): void {
         $email = (new TemplatedEmail())
-            ->from(new Address(self::FROM_EMAIL, self::FROM_NAME))
+            ->from(new Address($this->adminEmail, $this->adminName))
             ->to(new Address($toEmail))
             ->subject($subject)
             ->htmlTemplate($templatePath)

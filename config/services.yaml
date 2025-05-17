@@ -5,10 +5,20 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     uploads_directory: '%kernel.project_dir%/public/uploads'
+    adminEmail: '%env(ADMIN_EMAIL)%'
+    adminName: '%env(NAME_EMAIL)%'
+    stripeWebhookSecret : '%env(STRIPE_WEBHOOK_SECRET)%'
+    stripeSecretKey : '%env(STRIPE_SECRET_KEY)%'
 
 services:
     # default configuration for services in *this* file
     _defaults:
+        bind:
+            $adminEmail: '%adminEmail%'
+            $adminName: '%adminName%'
+            $stripeWebhookSecret : '%stripeWebhookSecret%'
+            $stripeSecretKey : '%stripeSecretKey%'
+            
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 

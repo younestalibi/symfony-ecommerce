@@ -6,8 +6,6 @@ use App\Repository\ProductRepository;
 use App\Service\MailService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class HomeController extends AbstractController
@@ -25,13 +23,11 @@ final class HomeController extends AbstractController
     public function testEmail(MailService $mailService): Response
     {
         $mailService->sendEmail(
-            'younessetalibi11@gamil.com',
+            'younessetalibi11@gmail.com',
             'Your Invoice',
-            'email/invoice.html.twig',
+            'email/test.html.twig',
             ['invoiceId' => 456, 'amount' => 99.99]
         );
-        
-
         return new Response('Email sent!');
     }
 }
