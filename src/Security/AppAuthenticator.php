@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Entity\User;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -51,6 +52,7 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
         // redirect the users to their workspace based on their role
         /** @var User $user */
         $user = $token->getUser();
+        
         return match (in_array('ROLE_ADMIN', $user->getRoles())) {
             true => new RedirectResponse($this->urlGenerator->generate(self::ADMIN_ROUTE)),
             false => new RedirectResponse($this->urlGenerator->generate(self::HOME_ROUTE))

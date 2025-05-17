@@ -23,6 +23,7 @@ final class PaymentService
         private EntityManagerInterface $em,
         private LoggerInterface $logger,
         private UrlGeneratorInterface $urlGenerator,
+        private CurrencyContext $currency,
     ) {}
 
     public function createStripeSession(User $user, Order $order, string $successRoute, string $cancelRoute): Session
@@ -32,7 +33,7 @@ final class PaymentService
         $lineItems = array_map(function ($orderItem) {
             return [
                 'price_data' => [
-                    'currency' => 'eur',
+                    'currency' => $this->currency->getCurrency(),
                     'unit_amount' => $orderItem->getPrice() * 100,
                     'product_data' => [
                         'name' => $orderItem->getProductName(),

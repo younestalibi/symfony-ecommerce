@@ -1,34 +1,39 @@
 {% extends 'layout/admin.html.twig' %}
 
-{% block title %}Category Index{% endblock %}
+{% block title %}Category Index
+{% endblock %}
 
 {% block main_content %}
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-2xl font-semibold text-gray-800">Category Index</h1>
-    <a href="{{ path('app_admin_category_management_new') }}" class="inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition">
-      + Create New
-    </a>
-  </div>
 
-  {% set headers = ['ID', 'Name', 'Slug', 'Actions'] %}
+	<div class="flex items-center justify-between mb-6">
+		<h1 class="text-2xl font-semibold text-gray-800">Category Index</h1>
+		<a href="{{ path('app_admin_category_management_new') }}" class="inline-block rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition">
+			+ Create New
+		</a>
+	</div>
 
-  {% set rows = [] %}
-  {% for category in categories %}
-    {% set actions %}
-      <a href="{{ path('app_admin_category_management_show', { id: category.id }) }}" class="text-indigo-600 hover:underline">Show</a>
-      <a href="{{ path('app_admin_category_management_edit', { id: category.id }) }}" class="text-green-600 hover:underline ml-2">Edit</a>
-    {% endset %}
+	{% set headers = ['ID', 'Name', 'Slug', 'Actions'] %}
 
-    {% set row = [
+	{% set rows = [] %}
+	{% for category in categories %}
+		{% set actions %}
+		<div class='flex gap-2'>
+			<a href="{{ path('app_admin_category_management_show', { id: category.id }) }}" class="text-indigo-600 hover:underline">Show</a>
+			<a href="{{ path('app_admin_category_management_edit', { id: category.id }) }}" class="text-green-600 hover:underline">Edit</a>
+			{{ include('admin/category_management/_delete_form.html.twig') }}
+		</div>
+		{% endset %}
+
+		{% set row = [
       { value: category.id },
       { value: category.name },
       { value: category.slug },
       { value: actions|raw, is_html: true }
     ] %}
 
-    {% set rows = rows|merge([row]) %}
-  {% else %}
-    {% set rows = [
+		{% set rows = rows|merge([row]) %}
+	{% else %}
+		{% set rows = [
       [
         { value: 'No records found.', is_html: false },
         { value: '', is_html: false },
@@ -36,9 +41,9 @@
         { value: '', is_html: false }
       ]
     ] %}
-  {% endfor %}
+	{% endfor %}
 
-  {% include 'components/_table.html.twig' with {
+	{% include 'components/_table.html.twig' with {
     headers: headers,
     rows: rows
   } %}

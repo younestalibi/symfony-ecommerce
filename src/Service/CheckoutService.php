@@ -6,7 +6,6 @@ use App\Entity\Order;
 use App\Entity\OrderItem;
 use App\Entity\User;
 use App\Enum\CartStatus;
-use App\Enum\Currency;
 use App\Repository\AddressRepository;
 use App\Repository\CartRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -78,7 +77,6 @@ class CheckoutService
         $order->setShippingZipCode($address->getZipCode());
 
         $order->setReference($this->generateReference());
-        $order->setCurrency(Currency::USD);
 
         $total = 0;
         foreach ($cart->getCartItems() as $cartItem) {

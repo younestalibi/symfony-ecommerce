@@ -51,12 +51,12 @@
 								<span>{{ item.product.name }}
 									x
 									{{ item.quantity }}</span>
-								<span class="font-semibold">${{ subtotal|number_format(2) }}</span>
+								<span class="font-semibold">{{currency_with_symbol() ~ subtotal|number_format(2) }}</span>
 							</li>
 						{% endfor %}
 					</ul>
 
-					<p class="mt-6 text-right text-xl font-bold">Total: ${{ total|number_format(2) }}</p>
+					<p class="mt-6 text-right text-xl font-bold">Total: {{currency_with_symbol() ~ total|number_format(2) }}</p>
 
 					<button type="submit" class="mt-6 w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Place order">
 						Place Order

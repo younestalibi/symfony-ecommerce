@@ -21,7 +21,7 @@
 	</head>
 	<body>
 		<div
-			class="container mx-auto mt-4">
+			class="container mx-auto">
 			{# Flash messages container fixed top-right #}
 			<div id="flash-messages" class="fixed top-4 right-4 z-50 space-y-4 max-w-sm w-full" role="region" aria-live="polite" aria-atomic="true">
 				{% for label, messages in app.flashes %}
@@ -30,12 +30,12 @@
 						{% set isSuccess = label == 'success' %}
 						{% set isError = label == 'error' %}
 						<div role="alert" class="rounded-md border p-4 shadow-sm flex items-start gap-4
-																             {{ isSuccess ? 'border-green-300 bg-green-50 text-green-700' : '' }}
-																             {{ isError ? 'border-red-300 bg-red-50 text-red-700' : '' }}">
+							{{ isSuccess ? 'border-green-300 bg-green-50 text-green-700' : '' }}
+							{{ isError ? 'border-red-300 bg-red-50 text-red-700' : '' }}">
 
 							<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 flex-shrink-0
-																		               {{ isSuccess ? 'text-green-600' : '' }}
-																		               {{ isError ? 'text-red-600' : '' }}">
+																											               {{ isSuccess ? 'text-green-600' : '' }}
+																											               {{ isError ? 'text-red-600' : '' }}">
 								{% if isSuccess %}
 									<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
 								{% elseif isError %}

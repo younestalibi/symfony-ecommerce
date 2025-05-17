@@ -16,8 +16,11 @@
 	{% set rows = [] %}
 	{% for address in addresses %}
 		{% set actions %}
-		<a href="{{ path('app_frontend_address_show', {'id': address.id}) }}" class="text-blue-600 underline">show</a>
-		<a href="{{ path('app_frontend_address_edit', {'id': address.id}) }}" class="text-blue-600 underline ml-2">edit</a>
+		<div class='flex gap-2'>
+			<a href="{{ path('app_frontend_address_show', {'id': address.id}) }}" class="text-blue-600 hover:underline">show</a>
+			<a href="{{ path('app_frontend_address_edit', {'id': address.id}) }}" class="text-blue-600 hover:underline">edit</a>
+			{{ include('frontend/address/_delete_form.html.twig') }}
+		</div>
 		{% endset %}
 
 		{% set row = [

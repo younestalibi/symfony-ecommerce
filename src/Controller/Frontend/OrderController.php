@@ -3,6 +3,7 @@
 namespace App\Controller\Frontend;
 
 use App\Entity\Order;
+use App\Entity\User;
 use App\Repository\OrderRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,8 +15,11 @@ final class OrderController extends AbstractController
     #[Route(name: 'app_frontend_order_index', methods: ['GET'])]
     public function index(OrderRepository $orderRepository): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
+      
         return $this->render('frontend/order/index.html.twig', [
-            'orders' => $orderRepository->findAll(),
+            'orders' => $user->getOrders(),
         ]);
     }
 

@@ -17,8 +17,11 @@
 		{% set imageHtml = '<img class="size-13 aspect-square" src="' ~ asset('uploads/' ~ product.image) ~ '" alt="' ~ product.name ~ ' image"/>' %}
 
 		{% set actions %}
-		<a href="{{ path('app_admin_product_management_show', { id: product.id }) }}" class="text-indigo-600 hover:underline">Show</a>
-		<a href="{{ path('app_admin_product_management_edit', { id: product.id }) }}" class="text-green-600 hover:underline ml-2">Edit</a>
+		<div class='flex gap-2'>
+			<a href="{{ path('app_admin_product_management_show', { id: product.id }) }}" class="text-indigo-600 hover:underline">Show</a>
+			<a href="{{ path('app_admin_product_management_edit', { id: product.id }) }}" class="text-green-600 hover:underline">Edit</a>
+			{{ include('admin/product_management/_delete_form.html.twig') }}
+		</div>
 		{% endset %}
 
 		{% set row = [

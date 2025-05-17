@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Enum\Currency;
 use App\Enum\OrderStatus;
 use App\Repository\OrderRepository;
 use DateTimeImmutable;
@@ -57,9 +56,6 @@ class Order
 
     #[ORM\Column(length: 30)]
     private ?string $shippingZipCode = null;
-
-    #[ORM\Column(enumType: Currency::class)]
-    private ?Currency $currency = null;
 
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
@@ -227,17 +223,6 @@ class Order
         return $this;
     }
 
-    public function getCurrency(): ?Currency
-    {
-        return $this->currency;
-    }
-
-    public function setCurrency(Currency $currency): static
-    {
-        $this->currency = $currency;
-
-        return $this;
-    }
 
     #[ORM\PrePersist]
     public function getCreatedAt(): ?\DateTimeImmutable
