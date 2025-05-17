@@ -1,6 +1,5 @@
 ### 🛒 `README.md` – Projet E-commerce Symfony
 
-````markdown
 # 🛍️ Application E-commerce Symfony
 
 Ce projet est un site e-commerce complet développé avec **Symfony v6.4** pour le backend et **Twig** pour le frontend, intégrant **Stripe** pour le traitement sécurisé des paiements.
@@ -18,6 +17,14 @@ Ce projet est un site e-commerce complet développé avec **Symfony v6.4** pour 
 - Stripe CLI (pour les tests de webhook)  
 - Service SMTP (pour l’envoi des e-mails)
 
+#### 📦 Installation de Stripe CLI
+
+Stripe CLI permet d’écouter les événements Webhook localement pendant le développement.
+
+➡️ [Voir ma vidéo explicative sur YouTube](https://youtu.be/jJu8vQH7hLY?t=10)  
+➡️ [Documentation officielle Stripe CLI](https://stripe.com/docs/stripe-cli#install)
+
+````markdown
 ### Installation
 
 ```bash
