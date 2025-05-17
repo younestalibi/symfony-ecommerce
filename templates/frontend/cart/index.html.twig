@@ -28,13 +28,11 @@
 												<h3 class="text-lg font-semibold">{{ item.product.name }}</h3>
 											</header>
 											<p class="text-sm text-gray-500 mt-1">Price:
-												<span class="font-semibold">${{ item.product.price|number_format(2) }}</span>
+												<span class="font-semibold">{{currency_with_symbol()~item.product.price|number_format(2)}}</span>
 												each</p>
 											<p class="text-sm text-gray-500 mt-1">Quantity:
 												<span>{{ item.quantity }}</span>
 											</p>
-
-
 										</div>
 									</div>
 									<div>
@@ -57,7 +55,7 @@
 								</div>
 
 								<div class="text-right font-bold text-lg text-blue-600 self-center ml-6 whitespace-nowrap">
-									${{ itemTotal|number_format(2) }}
+									{{currency_with_symbol()~itemTotal|number_format(2) }}
 								</div>
 							</article>
 						{% endfor %}
@@ -76,7 +74,7 @@
 					<div class="border-t pt-4 text-gray-800">
 						<p class="text-sm text-gray-600 mb-2">Items:
 							{{ cart.cartItems|length }}</p>
-						<p class="text-lg font-bold">Subtotal: ${{ total|number_format(2) }}</p>
+						<p class="text-lg font-bold">Subtotal: {{ currency_with_symbol() ~ total|number_format(2) }}</p>
 					</div>
 
 					<a href="{{ path('app_frontend_checkout') }}" class="mt-6 block w-full text-center bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-blue-500">

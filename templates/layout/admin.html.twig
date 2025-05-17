@@ -4,12 +4,14 @@
 	{% set active_routes = {
         'Categories': ['app_admin_category_management_index', 'app_admin_category_management_new', 'app_admin_category_management_edit', 'app_admin_category_management_show'],
         'Products': ['app_admin_product_management_index', 'app_admin_product_management_new', 'app_admin_product_management_edit', 'app_admin_product_management_show'],
+		'Orders': ['app_admin_order_management_index', 'app_admin_order_management_show'],
     } %}
 	{% set current_route = app.request.attributes.get('_route') %}
 	{% set sidebar_links = [ 
         {'label':'Dashboard', 'route': 'app_admin_dashboard'}, 
         {'label': 'Categories', 'route':'app_admin_category_management_index'},
-        {'label': 'Products', 'route':'app_admin_product_management_index'}
+        {'label': 'Products', 'route':'app_admin_product_management_index'},
+        {'label': 'Orders', 'route':'app_admin_order_management_index'}
         ] %}
 
 	<div class="flex">

@@ -1,11 +1,11 @@
-{% extends 'layout/user.html.twig' %}
+{% extends 'layout/admin.html.twig' %}
 
 {% block title %}List of Orders
 {% endblock %}
 
 {% block main_content %}
 	<div class="flex items-center justify-between mb-6">
-		<h1 class="text-2xl font-semibold text-gray-800">My Orders</h1>
+		<h1 class="text-2xl font-semibold text-gray-800">List Orders</h1>
 	</div>
 	{% set headers = [
         'Reference','Status', 'Created at','Product','Total',
@@ -15,7 +15,7 @@
 	{% set rows = [] %}
 	{% for order in orders %}
 		{% set actions %}
-		<a href="{{ path('app_frontend_order_show', {'id': order.id}) }}" class="text-blue-600 underline">show</a>
+		<a href="{{ path('app_admin_order_management_show', {'id': order.id}) }}" class="text-blue-600 hover:underline">show</a>
 		{% endset %}
 
 		{# Format order items as an HTML list #}
@@ -29,17 +29,32 @@
 		</ul>
 		{% endset %}
 
-		{# Format order items as an HTML list #}
-		{% set status %}
-		<b class="bg-teal-600 p-2 text-white rounded-md">{{order.status.value}}</b>
-		{% endset %}
+
+		{% set editable_statuses = ['paid', 'processing', 'shipped', 'delivered'] %}
+
+		{% if order.status.value in editable_statuses %}
+			{% set status_form %}
+			<form method="post" action="{{ path('app_admin_order_update_status', {'id': order.id}) }}">
+				<select name="status" class="border rounded px-2 py-1 text-sm" onchange="this.form.submit()">
+					{% for option in editable_statuses %}
+						<option value="{{ option }}" {% if order.status.value == option %} selected {% endif %}>{{ option|capitalize }}</option>
+					{% endfor %}
+				</select>
+				<input type="hidden" name="_token" value="{{ csrf_token('update_order_status_' ~ order.id) }}">
+			</form>
+			{% endset %}
+			{% set status = status_form %}
+		{% else %}
+			{% set status = order.status.value %}
+		{% endif %}
+
 
 		{% set row = [
 		{ value: order.reference },
-		{ value: status|raw, is_html:true },
+		{ value: status|raw, is_html: true },
         {value:  order.createdAt ? order.createdAt|date('Y-m-d H:i:s') : ''  },
 		{ value: items|raw, is_html: true },
-		{ value: currency_with_symbol()~order.total},
+		{ value: order.total ~'$'},
 		{ value: order.shippingLine1 },
 		{ value: actions|raw, is_html: true }
 	] %}

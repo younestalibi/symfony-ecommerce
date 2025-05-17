@@ -6,13 +6,14 @@
 {% block main_content %}
 	<div class="flex items-center justify-between mb-6">
 		<h1 class="text-2xl font-semibold text-gray-800">Order Details</h1>
+		<a href="{{ path('app_frontend_order_index') }}">back to list</a>
 	</div>
 
 	{# Format order items as an HTML list #}
 	{% set items %}
 	<ul class="list-disc pl-5">
 		{% for item in order.orderItems %}
-			<li>{{ item.product.name }}
+			<li>{{ item.productName }}
 				×
 				{{ item.quantity }}</li>
 		{% endfor %}
@@ -20,10 +21,10 @@
 	{% endset %}
 
 	{% set total %}
-	<b>{{ order.total ~' '~ order.currency.value}}</b>
+	<b>{{ currency_with_symbol()~order.total}}</b>
 	{% endset %}
 	{% set details = [
-    { label: 'Created At', value: order.createdAt|date('Y-m-d H:i:s') },    
+    { label: 'Created At', value: order.createdAt ? order.createdAt|date('Y-m-d H:i:s') : ''  },    
 	{ label: 'Reference', value: order.reference },
 	{ label: 'Status', value: order.status.value },
     { label: 'Shipping Line 1', value: order.shippingLine1 },
@@ -35,7 +36,64 @@
 	{ label: 'Total', value: total  },
 ] %}
 
-	{{ include('components/_detail_list.html.twig', { items: details }) }}
+	<div class="flex gap-10">
+		<div class='flex-5'>
+			{{ include('components/_detail_list.html.twig', { items: details }) }}
+		</div>
+		<div class="flex-3">
+			{% set statuses = ['pending', 'paid', 'processing', 'shipped', 'delivered'] %}
+			{% set activeReached = false %}
 
-	<a href="{{ path('app_frontend_order_index') }}">back to list</a>
+			<ol class="relative space-y-8 before:absolute before:-ml-px before:h-full before:w-0.5 before:rounded-full before:bg-gray-200">
+				{% for status in statuses %}
+					{% if not activeReached %}
+						{% set isActive = true %}
+					{% else %}
+						{% set isActive = false %}
+					{% endif %}
+
+					{% if status == order.status.value %}
+						{% set activeReached = true %}
+						{% set isActive = true %}
+					{% endif %}
+
+					<li class="relative -ms-1.5 flex items-start gap-4">
+						<span class="size-3 shrink-0 rounded-full {{ isActive ? 'bg-blue-600' : 'bg-gray-300' }}"></span>
+
+						<div class="-mt-2">
+							<time class="text-xs/none font-medium {{ isActive ? 'text-blue-600' : 'text-gray-400' }}">
+								{{ status|capitalize }}
+							</time>
+
+							{% if status == order.status.value %}
+								<h3 class="text-lg font-bold text-gray-900">Current Status</h3>
+							{% elseif isActive %}
+								<h3 class="text-lg font-bold text-gray-700">Completed</h3>
+							{% else %}
+								<h3 class="text-lg font-bold text-gray-400">Upcoming</h3>
+							{% endif %}
+
+							<p class="mt-0.5 text-sm {{ isActive ? 'text-gray-700' : 'text-gray-400' }}">
+								{% if status == 'pending' %}
+									Order has been placed, awaiting payment.
+								{% elseif status == 'paid' %}
+									Payment received.
+								{% elseif status == 'processing' %}
+									Order is being processed.
+								{% elseif status == 'shipped' %}
+									Order shipped to delivery address.
+								{% elseif status == 'delivered' %}
+									Order delivered to customer.
+								{% else %}
+									Status update.
+								{% endif %}
+							</p>
+						</div>
+					</li>
+				{% endfor %}
+			</ol>
+
+		</div>
+	</div>
+
 {% endblock %}
