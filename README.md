@@ -138,3 +138,11 @@ templates/
 ├── Components/
 └── email/
 ```
+---
+
+## Tips
+
+### 💡 Conseils importants
+
+- 🛡️ **Désactivez temporairement votre antivirus** lors des tests. Certains antivirus peuvent bloquer l’envoi d’e-mails ou les connexions sortantes nécessaires pour les paiements via Stripe, ce qui peut causer des erreurs.
+- 🖥️ **Utilisez une vue desktop** pour tester l’application. Le design et les fonctionnalités sont optimisés pour un affichage sur ordinateur.
