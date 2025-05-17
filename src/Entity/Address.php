@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\AddressRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AddressRepository::class)]
 class Address
@@ -14,18 +15,42 @@ class Address
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Address line 1 cannot be blank.")]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Address line 1 cannot be longer than {{ limit }} characters."
+    )]
     private ?string $line1 = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Address line 2 cannot be longer than {{ limit }} characters."
+    )]
     private ?string $line2 = null;
 
     #[ORM\Column(length: 30)]
+    #[Assert\NotBlank(message: "City is required.")]
+    #[Assert\Length(
+        max: 30,
+        maxMessage: "City name cannot be longer than {{ limit }} characters."
+    )]
     private ?string $city = null;
 
     #[ORM\Column(length: 30)]
+    #[Assert\NotBlank(message: "Country is required.")]
+    #[Assert\Length(
+        max: 30,
+        maxMessage: "Country name cannot be longer than {{ limit }} characters."
+    )]
     private ?string $country = null;
 
     #[ORM\Column(length: 30)]
+    #[Assert\NotBlank(message: "Zip code is required.")]
+    #[Assert\Length(
+        max: 30,
+        maxMessage: "Zip code cannot be longer than {{ limit }} characters."
+    )]
     private ?string $zipCode = null;
 
     #[ORM\ManyToOne(inversedBy: 'addresses')]
@@ -33,7 +58,9 @@ class Address
     private ?User $user = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: "isDefault flag must be set.")]
     private ?bool $isDefault = null;
+
 
     public function getId(): ?int
     {
